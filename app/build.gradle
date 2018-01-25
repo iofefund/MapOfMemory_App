@@ -38,6 +38,7 @@ dependencies {
     def picasso = "2.5.2"
     def retrofit = "2.3.0"
     def gson = "2.8.2"
+    def storIO = "3.0.0"
 
     // Mosby
     compile "com.hannesdorfmann.mosby3:mvi:$mosby"
@@ -62,6 +63,13 @@ dependencies {
 
     // Gson
     compile "com.google.code.gson:gson:$gson"
+
+    // StorIO
+    implementation "com.pushtorefresh.storio3:sqlite:$storIO"
+    implementation "com.pushtorefresh.storio3:content-resolver:$storIO"
+    implementation "com.pushtorefresh.storio3:sqlite-annotations:$storIO"
+
+    annotationProcessor "com.pushtorefresh.storio3:sqlite-annotations-processor:$storIO"
 
     // Other
     compile 'com.makeramen:roundedimageview:2.3.0'

@@ -1,13 +1,11 @@
 package org.mapofmemory.screens.menu;
 
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
-import com.hannesdorfmann.mosby3.mvp.MvpPresenter;
 
 import org.mapofmemory.R;
 import org.mapofmemory.adapters.PlaceEntityAdapter;
@@ -24,13 +22,13 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
     @NonNull
     @Override
     public MenuPresenter createPresenter() {
-        return new MenuPresenter();
+        return new MenuPresenter(getApplicationContext());
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_menu);
         getSupportActionBar().hide();
 
         ButterKnife.bind(this);

@@ -11,7 +11,7 @@ import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 public class AppMvpPresenter<V extends MvpView> extends MvpBasePresenter<V> {
     public DataManager mDataManager;
-    public AppMvpPresenter(){
-        mDataManager = new DataManager();
+    public AppMvpPresenter(Context context){
+        mDataManager = new DataManager(context);
     }
 }
