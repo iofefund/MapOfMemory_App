@@ -63,7 +63,7 @@ public class DataManager {
         return restService.getPlaces();
     }
 
-    public Single<List<MonumentEntity>> getMonuments(String id){
-        return restService.getMonuments(id);
+    public Single<List<MonumentEntity>> getMonuments(){
+        return restService.getMonuments();
     }
 }

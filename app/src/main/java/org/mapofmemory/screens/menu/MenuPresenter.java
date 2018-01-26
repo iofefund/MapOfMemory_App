@@ -38,25 +38,15 @@ public class MenuPresenter extends AppMvpPresenter<MenuView>{
                 .subscribe(places -> {
                     getView().showPlaces(places);
                     cachePlaces(places);
-                    loadMonuments(places);
-                });
+                    loadMonuments();
+                }, errors -> {});
     }
 
-    public void loadMonuments(List<PlaceEntity> places){
-        List<Integer> ids = Observable.fromIterable(places)
-                .map(placeEntity -> placeEntity.getId())
-                .toList()
-                .blockingGet();
-        List<Single<List<MonumentEntity>>> singles = new ArrayList<>();
-        for (Integer id: ids){
-            singles.add(mDataManager.getMonuments(id + ""));
-        }
-        Single.concat(singles)
+    public void loadMonuments(){
+        mDataManager.getMonuments()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(monuments -> Log.d("MONUMENTS", monuments.size() + "!"));
-
-
+                .subscribe(monuments -> cacheMonuments(monuments));
     }
 
     private void cachePlaces(List<PlaceEntity> places){
@@ -89,5 +79,6 @@ public class MenuPresenter extends AppMvpPresenter<MenuView>{
                 .objects(monuments)
                 .prepare()
                 .executeAsBlocking();
+        getView().onDataSuccess();
     }
 }

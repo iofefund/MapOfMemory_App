@@ -17,5 +17,5 @@ public interface RestService{
     @GET("places.php")
     Single<List<PlaceEntity>> getPlaces();
     @GET("monuments.php")
-    Single<List<MonumentEntity>> getMonuments(@Query("place_id") String placeId);
+    Single<List<MonumentEntity>> getMonuments();
 }
