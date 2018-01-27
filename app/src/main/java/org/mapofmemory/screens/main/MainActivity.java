@@ -1,6 +1,7 @@
 package org.mapofmemory.screens.main;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -14,44 +15,52 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.hannesdorfmann.mosby3.mvp.MvpActivity;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import org.mapofmemory.R;
+import org.mapofmemory.entities.PlaceEntity;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.reactivex.Observable;
+
+public class MainActivity extends MvpActivity<MainView, MainPresenter>
+        implements NavigationView.OnNavigationItemSelectedListener, MainView {
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.nav_view) NavigationView navigationView;
+    @BindView(R.id.drawer_layout) DrawerLayout drawer;
+
+    private MaterialSpinner spinner;
+    private TextView placeTitleView;
+
+    @NonNull
+    @Override
+    public MainPresenter createPresenter() {
+        return new MainPresenter(getApplicationContext(), getIntent().getIntExtra("place_id", -1));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        spinner = (MaterialSpinner) navigationView.getHeaderView(0).findViewById(R.id.spinner);
+        placeTitleView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.place_title);
         navigationView.setNavigationItemSelectedListener(this);
-
-        Spinner spin = (Spinner)navigationView.getHeaderView(0).findViewById(R.id.spinner1);
-
-        ArrayAdapter<String> namesAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.names));
-
-        namesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spin.setAdapter(namesAdapter);
+        spinner.setOnItemSelectedListener((MaterialSpinner view, int position, long id, Object item) -> {getPresenter().changePlace(position);});
+        getPresenter().loadPlaces();
     }
 
     @Override
@@ -66,19 +75,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -89,25 +92,26 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onPlacesLoad(List<PlaceEntity> places) {
+        String[] titles = new String[places.size()];
+        for (int i = 0; i <= places.size() - 1; i++){
+            titles[i] = places.get(i).getTitle();
+        }
+        spinner.setPadding(0, 0, 0, 0);
+        spinner.setItems(titles);
+    }
+
+    @Override
+    public void onPlaceSelected(PlaceEntity place) {
+        spinner.setText(place.getTitle());
+        placeTitleView.setText(place.getTitle());
+        navigationView.getMenu().findItem(R.id.nav_about).setTitle("О " + place.getTitle());
     }
 }

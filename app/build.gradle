@@ -74,4 +74,6 @@ dependencies {
 
     // Other
     compile 'com.makeramen:roundedimageview:2.3.0'
+    compile 'com.jaredrummler:material-spinner:1.2.4'
+
 }

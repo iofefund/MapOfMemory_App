@@ -5,27 +5,40 @@
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
     android:orientation="vertical"
+    android:gravity="bottom"
+    android:padding="4dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
-    <TextView
-        android:gravity="center_horizontal"
-        android:textSize="30dp"
-        android:text="САНДРОМОХ"
+    <LinearLayout
+        android:padding="8dp"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:gravity="center_horizontal"
-        android:textSize="20dp"
-        android:layout_marginTop="15dp"
-        android:text="Мемориальный комплекс"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
-    <Spinner
-        android:id="@+id/spinner1"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        />
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/place_title"
+            android:gravity="center_horizontal"
+            android:textSize="24dp"
+            android:text=""
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:gravity="center_horizontal"
+            android:textSize="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Мемориальный комплекс"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <View
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:padding="2dp"
+            android:background="@android:color/darker_gray"/>
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/spinner"
+            app:ms_background_color="@color/colorPrimary"
+            app:ms_text_color="@android:color/white"
+
+            android:layout_width="match_parent"
+            android:layout_height="25dp"/>
+    </LinearLayout>
 </LinearLayout>

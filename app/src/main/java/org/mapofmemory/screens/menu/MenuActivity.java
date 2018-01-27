@@ -40,16 +40,21 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
 
     @Override
     public void showPlaces(List<PlaceEntity> places) {
-       // places.addAll(places);
+        //places.addAll(places);
         PlaceEntityAdapter adapter = new PlaceEntityAdapter(places);
+        adapter.setOnPlaceClickListener(place -> openPlace(place.getId()));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
 
+    public void openPlace(int id){
+        Intent newInt = new Intent(this, MainActivity.class);
+        newInt.putExtra("place_id", id);
+        startActivity(newInt);
+    }
+
     @Override
     public void onDataSuccess() {
-        Intent newInt = new Intent(this, MainActivity.class);
-        startActivity(newInt);
-        Toast.makeText(this, "Данные обновлены!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Данные обновлены!", Toast.LENGTH_SHORT).show();
     }
 }
