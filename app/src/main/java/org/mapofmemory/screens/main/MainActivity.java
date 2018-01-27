@@ -1,6 +1,10 @@
 package org.mapofmemory.screens.main;
 
+import android.Manifest;
+import android.content.Context;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,9 +23,20 @@ import android.widget.TextView;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.jaredrummler.materialspinner.MaterialSpinner;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import org.mapofmemory.R;
 import org.mapofmemory.entities.PlaceEntity;
+import org.mapofmemory.screens.map.MapFragment;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.BoundingBoxE6;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +50,6 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
-
     private MaterialSpinner spinner;
     private TextView placeTitleView;
 
@@ -48,6 +62,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Configuration.getInstance().load(getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -61,6 +76,12 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         navigationView.setNavigationItemSelectedListener(this);
         spinner.setOnItemSelectedListener((MaterialSpinner view, int position, long id, Object item) -> {getPresenter().changePlace(position);});
         getPresenter().loadPlaces();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
     }
 
     @Override
@@ -113,5 +134,10 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         spinner.setText(place.getTitle());
         placeTitleView.setText(place.getTitle());
         navigationView.getMenu().findItem(R.id.nav_about).setTitle("О " + place.getTitle());
+    }
+
+    @Override
+    public void onMapFragment(double lat, double lng) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame, MapFragment.newInstance(lat, lng)).commit();
     }
 }

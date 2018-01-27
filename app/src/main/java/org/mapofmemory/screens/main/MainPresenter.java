@@ -38,6 +38,7 @@ public class MainPresenter extends AppMvpPresenter<MainView> {
                 .filter(placeEntity -> placeEntity.getId() == placeId)
                 .blockingFirst();
         getView().onPlaceSelected(currentPlace);
+        getView().onMapFragment(62.888333, 34.680833);
     }
 
     public void changePlace(int num){

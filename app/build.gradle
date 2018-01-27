@@ -75,5 +75,8 @@ dependencies {
     // Other
     compile 'com.makeramen:roundedimageview:2.3.0'
     compile 'com.jaredrummler:material-spinner:1.2.4'
+    compile 'org.osmdroid:osmdroid-android:5.6.5'
+    implementation 'com.karumi:dexter:4.2.0'
+
 
 }

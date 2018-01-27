@@ -13,4 +13,5 @@ import java.util.List;
 public interface MainView extends MvpView{
     void onPlacesLoad(List<PlaceEntity> places);
     void onPlaceSelected(PlaceEntity place);
+    void onMapFragment(double lat, double lng);
 }
