@@ -8,6 +8,14 @@ import com.pushtorefresh.storio3.sqlite.annotations.StorIOSQLiteType;
 @StorIOSQLiteType(table = "places")
 public class PlaceEntity{
 
+	@SerializedName("lat")
+	@StorIOSQLiteColumn(name = "lat")
+	private double lat;
+
+	@SerializedName("lng")
+	@StorIOSQLiteColumn(name = "lng")
+	private double lng;
+
 	@SerializedName("img")
 	@StorIOSQLiteColumn(name = "img")
 	private String img;
@@ -32,12 +40,30 @@ public class PlaceEntity{
 
 	}
 	@StorIOSQLiteCreator
-	PlaceEntity(int id, String title, String img, String imgRoot, String about){
+	PlaceEntity(int id, double lat, double lng, String title, String img, String imgRoot, String about){
 		this.id = id;
+		this.lat = lat;
+		this.lng = lng;
 		this.title = title;
 		this.img = img;
 		this.imgRoot = imgRoot;
 		this.about = about;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public void setLng(double lng) {
+		this.lng = lng;
+	}
+
+	public double getLng() {
+		return lng;
 	}
 
 	public void setImg(String img){

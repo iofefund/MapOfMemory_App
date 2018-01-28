@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -26,6 +29,8 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.ViewHolder;
 
 import org.mapofmemory.R;
 import org.mapofmemory.entities.PlaceEntity;
@@ -48,10 +53,13 @@ import io.reactivex.Observable;
 public class MainActivity extends MvpActivity<MainView, MainPresenter>
         implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.frame)
+    FrameLayout frame;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     private MaterialSpinner spinner;
     private TextView placeTitleView;
+    private DialogPlus dialogPlus;
 
     @NonNull
     @Override
@@ -74,7 +82,12 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         spinner = (MaterialSpinner) navigationView.getHeaderView(0).findViewById(R.id.spinner);
         placeTitleView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.place_title);
         navigationView.setNavigationItemSelectedListener(this);
-        spinner.setOnItemSelectedListener((MaterialSpinner view, int position, long id, Object item) -> {getPresenter().changePlace(position);});
+        spinner.setOnItemSelectedListener((MaterialSpinner view, int position, long id, Object item) -> {
+            getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().getFragments().get(0)).commit();
+            drawer.closeDrawers();
+            getPresenter().changePlace(position);
+            getPresenter().loadPlaces();
+        });
         getPresenter().loadPlaces();
     }
 
@@ -103,10 +116,9 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_search){
+            ((MapFragment)getSupportFragmentManager().findFragmentById(R.id.frame)).search();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -120,24 +132,52 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     }
 
     @Override
-    public void onPlacesLoad(List<PlaceEntity> places) {
+    public void onPlacesLoad(List<PlaceEntity> places, PlaceEntity currentPlace) {
         String[] titles = new String[places.size()];
         for (int i = 0; i <= places.size() - 1; i++){
             titles[i] = places.get(i).getTitle();
         }
         spinner.setPadding(0, 0, 0, 0);
         spinner.setItems(titles);
+        navigationView.getMenu().findItem(R.id.nav_about).setTitle("О " + currentPlace.getTitle());
     }
 
     @Override
-    public void onPlaceSelected(PlaceEntity place) {
-        spinner.setText(place.getTitle());
+    public void onPlaceSelected(PlaceEntity place, int index) {
+        spinner.setSelectedIndex(index);
         placeTitleView.setText(place.getTitle());
-        navigationView.getMenu().findItem(R.id.nav_about).setTitle("О " + place.getTitle());
+        drawer.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                navigationView.getMenu().findItem(R.id.nav_about).setTitle("О " + place.getTitle());
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+        getSupportActionBar().setTitle(place.getTitle());
+        onMapFragment(place.getLat(), place.getLng());
     }
 
     @Override
     public void onMapFragment(double lat, double lng) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame, MapFragment.newInstance(lat, lng)).commit();
+        MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, MapFragment.newInstance(getPresenter().getPlaceId(), lat, lng)).commit();
+    }
+
+
+    @Override
+    public void onSearchExpand() {
+
     }
 }

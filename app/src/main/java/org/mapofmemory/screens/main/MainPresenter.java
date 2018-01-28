@@ -12,6 +12,9 @@ import org.mapofmemory.entities.PlaceEntityTable;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by The Tronuo on 27.01.2018.
@@ -27,21 +30,34 @@ public class MainPresenter extends AppMvpPresenter<MainView> {
     }
 
     public void loadPlaces(){
-        this.places = mDataManager.storIOSQLite
+        mDataManager.storIOSQLite
                 .get()
                 .listOfObjects(PlaceEntity.class)
                 .withQuery(Query.builder().table(PlaceEntityTable.NAME).build())
                 .prepare()
-                .executeAsBlocking();
-        getView().onPlacesLoad(places);
-        PlaceEntity currentPlace = Observable.fromIterable(places)
-                .filter(placeEntity -> placeEntity.getId() == placeId)
-                .blockingFirst();
-        getView().onPlaceSelected(currentPlace);
-        getView().onMapFragment(62.888333, 34.680833);
+                .asRxSingle()
+                .subscribeOn(Schedulers.io())
+                .map(places -> {
+                    this.places = places;
+                    PlaceEntity currentPlace = Observable.fromIterable(places)
+                            .filter(placeEntity -> placeEntity.getId() == placeId)
+                            .blockingFirst();
+                    return currentPlace;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(currentPlace -> {
+                    getView().onPlacesLoad(places, currentPlace);
+                    getView().onPlaceSelected(currentPlace, places.indexOf(currentPlace));
+                    getView().onMapFragment(currentPlace.getLat(), currentPlace.getLng());
+                });
     }
 
     public void changePlace(int num){
-        getView().onPlaceSelected(places.get(num));
+        placeId = places.get(num).getId();
+        getView().onPlaceSelected(places.get(num), num);
+    }
+
+    public int getPlaceId() {
+        return placeId;
     }
 }

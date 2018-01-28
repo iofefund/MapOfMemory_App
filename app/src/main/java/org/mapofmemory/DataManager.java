@@ -29,6 +29,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class DataManager {
     private Retrofit retrofit;
+    public SharedPrefs sharedPrefs;
     private RestService restService;
     public StorIOSQLite storIOSQLite;
 
@@ -57,6 +58,7 @@ public class DataManager {
                         .deleteResolver(new PlaceEntityStorIOSQLiteDeleteResolver())
                         .build())
                 .build();
+        sharedPrefs = new SharedPrefs(context);
     }
 
     public Single<List<PlaceEntity>> getPlaces(){

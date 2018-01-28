@@ -3,6 +3,7 @@ package org.mapofmemory.screens.map;
 import com.hannesdorfmann.mosby3.mvp.MvpView;
 
 import org.mapofmemory.entities.MonumentEntity;
+import org.osmdroid.views.overlay.Marker;
 
 import java.util.List;
 
@@ -11,5 +12,6 @@ import java.util.List;
  */
 
 public interface MapView extends MvpView {
-    void showMonuments(List<MonumentEntity> monuments);
+    void showMonuments(List<MonumentEntity> monuments, String imgRoot);
+    void showSearch(List<MonumentEntity> monuments);
 }

@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
@@ -28,7 +29,9 @@ import butterknife.ButterKnife;
 
 public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implements MenuView, PermissionListener {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
+    @BindView(R.id.status) TextView status;
     private boolean isGranted = false;
+    private boolean isDataUpdated = false;
     @NonNull
     @Override
     public MenuPresenter createPresenter() {
@@ -44,6 +47,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
                 .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(this).check();
         ButterKnife.bind(this);
+        status.setText("Идет обновление данных...");
         getPresenter().loadPlaces();
     }
 
@@ -57,7 +61,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
     }
 
     public void openPlace(int id){
-        if (isGranted) {
+        if (isGranted && isDataUpdated) {
             Intent newInt = new Intent(this, MainActivity.class);
             newInt.putExtra("place_id", id);
             startActivity(newInt);
@@ -65,8 +69,15 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
     }
 
     @Override
-    public void onDataSuccess() {
+    public void onDataSuccess(String date) {
+        status.setText("Данные обновлены\n" + date);
+        isDataUpdated = true;
         //Toast.makeText(this, "Данные обновлены!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDataFailed(String date) {
+        status.setText("Данные обновлены\n" + date);
     }
 
     @Override

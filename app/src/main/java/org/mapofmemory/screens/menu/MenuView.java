@@ -12,5 +12,6 @@ import java.util.List;
 
 public interface MenuView extends MvpView {
     void showPlaces(List<PlaceEntity> places);
-    void onDataSuccess();
+    void onDataSuccess(String date);
+    void onDataFailed(String date);
 }

@@ -14,16 +14,10 @@ import org.mapofmemory.entities.PlaceEntityTable;
 
 public class MapOfMemoryOpenHelper extends SQLiteOpenHelper {
     final private static String DATABASE_NAME = "Data";
-    final private static int DATABASE_VERSION = 3;
+    final private static int DATABASE_VERSION = 13;
 
     public MapOfMemoryOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    @Override
-    public void onConfigure(SQLiteDatabase db) {
-        super.onConfigure(db);
-        db.setForeignKeyConstraintsEnabled(true);
     }
 
     @Override

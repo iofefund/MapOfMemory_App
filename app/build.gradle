@@ -69,7 +69,6 @@ dependencies {
     implementation "com.pushtorefresh.storio3:sqlite:$storIO"
     implementation "com.pushtorefresh.storio3:content-resolver:$storIO"
     implementation "com.pushtorefresh.storio3:sqlite-annotations:$storIO"
-
     annotationProcessor "com.pushtorefresh.storio3:sqlite-annotations-processor:$storIO"
 
     // Other
@@ -77,6 +76,10 @@ dependencies {
     compile 'com.jaredrummler:material-spinner:1.2.4'
     compile 'org.osmdroid:osmdroid-android:5.6.5'
     implementation 'com.karumi:dexter:4.2.0'
+    compile 'com.orhanobut:dialogplus:1.11@aar'
+    compile 'com.github.MKergall:osmbonuspack:6.4'
+    compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
+
 
 
 }
