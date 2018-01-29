@@ -2,9 +2,11 @@ package org.mapofmemory.screens.monument;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.transition.Fade;
+import android.text.Html;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,8 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
     @BindView(R.id.image) ImageView image;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.text) TextView text;
+    @BindView(R.id.type) TextView type;
+    @BindView(R.id.toolbar_layout) CollapsingToolbarLayout toolbarLayout;
     @NonNull
     @Override
     public MonumentPresenter createPresenter() {
@@ -46,7 +50,15 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Picasso.with(this).load(getIntent().getStringExtra("image_url")).into(image);
-        text.setText(getIntent().getStringExtra("descr"));
+        text.setText(Html.fromHtml(getIntent().getStringExtra("descr")));
+        if (!getIntent().getStringExtra("type2").isEmpty()){
+            type.setText(getIntent().getStringExtra("type2"));
+        }
+        else{
+            type.setVisibility(View.GONE);
+
+        }
+        toolbarLayout.setTitle(getIntent().getStringExtra("name"));
     }
 
 }

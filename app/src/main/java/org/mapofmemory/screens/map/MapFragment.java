@@ -129,6 +129,8 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                                     ActivityOptionsCompat.makeClipRevealAnimation(image, (int)image.getX(), (int)image.getY(), image.getWidth(), image.getHeight());
                             Intent newInt = new Intent(getContext(), MonumentActivity.class);
                             newInt.putExtra("image_url", window.getImageUrl());
+                            newInt.putExtra("name", monumentEntity.getName());
+                            newInt.putExtra("type2", monumentEntity.getType2());
                             newInt.putExtra("descr", monumentEntity.getDesc());
                             startActivity(newInt, options.toBundle());
                         });
