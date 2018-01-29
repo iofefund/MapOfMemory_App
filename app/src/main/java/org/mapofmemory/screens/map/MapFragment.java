@@ -1,15 +1,18 @@
 package org.mapofmemory.screens.map;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -25,6 +28,7 @@ import org.mapofmemory.R;
 import org.mapofmemory.adapters.MonumentEntityAdapter;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.main.MainActivity;
+import org.mapofmemory.screens.monument.MonumentActivity;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -118,7 +122,17 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                         startMarker.setOnMarkerClickListener(this);
                         startMarker.setPosition(startPoint);
                         startMarker.setTitle("Marker" + monumentEntity.getId());
-                        startMarker.setInfoWindow(new MonumentInfoWindow(map, monumentEntity.getImgs().size() != 0 ? imgRoot + monumentEntity.getImgs().get(0).getImg() : "", monumentEntity));
+                        MonumentInfoWindow monumentInfoWindow = new MonumentInfoWindow(map, monumentEntity.getImgs().size() != 0 ? imgRoot + monumentEntity.getImgs().get(0).getImg() : "", monumentEntity);
+                        monumentInfoWindow.setOnWindowClickListener(window -> {
+                            ImageView image = window.getImage();
+                            ActivityOptionsCompat options =
+                                    ActivityOptionsCompat.makeClipRevealAnimation(image, (int)image.getX(), (int)image.getY(), image.getWidth(), image.getHeight());
+                            Intent newInt = new Intent(getContext(), MonumentActivity.class);
+                            newInt.putExtra("image_url", window.getImageUrl());
+                            newInt.putExtra("descr", monumentEntity.getDesc());
+                            startActivity(newInt, options.toBundle());
+                        });
+                        startMarker.setInfoWindow(monumentInfoWindow);
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
                         startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
                         markers.add(startMarker);

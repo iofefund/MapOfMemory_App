@@ -1,12 +1,17 @@
 package org.mapofmemory;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import org.mapofmemory.entities.MonumentEntity;
+import org.mapofmemory.screens.monument.MonumentActivity;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
@@ -35,6 +40,10 @@ public class MonumentInfoWindow extends InfoWindow {
         return image;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
     @Override
     public void onOpen(Object item) {
         ButterKnife.bind(this, getView());
@@ -42,6 +51,16 @@ public class MonumentInfoWindow extends InfoWindow {
         if (!imageUrl.isEmpty()) Picasso.with(image.getContext()).load(imageUrl).error(R.drawable.no_photo).into(image);
         title.setText(monument.getName());
         type.setText(monument.getType2());
+        getView().setOnClickListener(v -> onWindowClickListener.onClick(this));
+    }
+
+    public interface OnWindowClickListener{
+        void onClick(MonumentInfoWindow window);
+    }
+    private OnWindowClickListener onWindowClickListener;
+
+    public void setOnWindowClickListener(OnWindowClickListener onWindowClickListener) {
+        this.onWindowClickListener = onWindowClickListener;
     }
 
     @Override
