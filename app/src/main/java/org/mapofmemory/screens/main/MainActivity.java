@@ -126,7 +126,9 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        if (id == R.id.nav_home){
+            onBackPressed();
+        }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

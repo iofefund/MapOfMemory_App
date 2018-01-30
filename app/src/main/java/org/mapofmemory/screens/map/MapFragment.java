@@ -34,6 +34,7 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 
@@ -91,11 +92,11 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         ButterKnife.bind(this, view);
         progressBar.setVisibility(View.VISIBLE);
         this.activity = getActivity();
-        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setTileSource(new XYTileSource("/storage/emulated/0/Download/Sandramokh.sqlite", 0, 16, 256, ".sqlite", new String[] {}));
         map.setMultiTouchControls(true);
+        map.setUseDataConnection(false);
         IMapController mapController = map.getController();
-        mapController.setZoom(30);
-        map.setMaxZoomLevel(34);
+        mapController.setZoom(16);
         GeoPoint startPoint = new GeoPoint(getArguments().getDouble("lat"), getArguments().getDouble("lng"));
         mapController.setCenter(startPoint);
         dialogPlus = DialogPlus.newDialog(getActivity())
