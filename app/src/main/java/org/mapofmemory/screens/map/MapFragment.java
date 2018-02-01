@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.service.quicksettings.Tile;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,14 +32,18 @@ import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.main.MainActivity;
 import org.mapofmemory.screens.monument.MonumentActivity;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
+import org.osmdroid.tileprovider.modules.MBTilesFileArchive;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.Marker;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,20 +98,30 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         ButterKnife.bind(this, view);
         progressBar.setVisibility(View.VISIBLE);
         this.activity = getActivity();
-        map.setTileSource(new XYTileSource("/storage/emulated/0/Download/Sandramokh.sqlite", 0, 16, 256, ".sqlite", new String[] {}));
-        map.setMultiTouchControls(true);
+
+        map.setTileProvider(new MapTileProviderBasic(getActivity()));
+       map.setTileSource(new XYTileSource(
+                "OSMPublicTransport",
+                16,
+                16,
+                256,
+                ".png",
+                new String[]{}
+        ));
+        //map.setTileSource(TileSourceFactory.PUBLIC_TRANSPORT);
         map.setUseDataConnection(false);
         IMapController mapController = map.getController();
         mapController.setZoom(16);
-        GeoPoint startPoint = new GeoPoint(getArguments().getDouble("lat"), getArguments().getDouble("lng"));
-        mapController.setCenter(startPoint);
+        //GeoPoint startPoint = new GeoPoint(getArguments().getDouble("lat"), getArguments().getDouble("lng"));
+        //mapController.setCenter(startPoint);
         dialogPlus = DialogPlus.newDialog(getActivity())
                 .setContentHolder(new ViewHolder(R.layout.view_search))
                 .setExpanded(true, (int)(0.75f * getActivity().getWindowManager().getDefaultDisplay().getHeight()))
                 .create();
-        getPresenter().loadMonuments();
+        //getPresenter().loadMonuments();
         initRadioGroup();
         RecyclerView recyclerView = (RecyclerView)dialogPlus.getHolderView().findViewById(R.id.recyclerView);
+        map.setVisibility(View.VISIBLE);
     }
 
     List<Marker> markers = new ArrayList<>();
