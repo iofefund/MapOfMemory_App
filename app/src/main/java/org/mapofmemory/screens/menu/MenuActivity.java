@@ -54,6 +54,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
     @Override
     public void showPlaces(List<PlaceEntity> places) {
         //places.addAll(places);
+        isDataUpdated = true;
         PlaceEntityAdapter adapter = new PlaceEntityAdapter(places);
         adapter.setOnPlaceClickListener(place -> openPlace(place.getId()));
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

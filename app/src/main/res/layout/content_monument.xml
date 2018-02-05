@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,21 +9,70 @@
     tools:context="org.mapofmemory.screens.monument.MonumentActivity"
     tools:showIn="@layout/activity_monument">
     <LinearLayout
+        android:padding="8dp"
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/type"
-            android:layout_margin="16dp"
             android:textStyle="bold"
             android:textSize="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <TextView
+            android:layout_marginTop="5dp"
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="@string/large_text" />
+            android:text="fsafas" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <org.osmdroid.views.MapView
+            android:layout_marginTop="10dp"
+            android:id="@+id/map_view"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"></org.osmdroid.views.MapView>
+            <RelativeLayout
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:paddingBottom="25dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btn_route"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp"
+                fancy:fb_borderColor="#FFFFFF"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="@android:color/holo_red_light"
+                fancy:fb_focusColor="@android:color/holo_red_dark"
+                fancy:fb_radius="30dp"
+                fancy:fb_text="Проложить маршрут"
+                fancy:fb_textColor="#FFFFFF" />
+            </RelativeLayout>
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_marginTop="7dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Координаты GPS" />
+            <TextView
+                android:layout_marginTop="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="32.4214' 51.123'" />
+        </LinearLayout>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

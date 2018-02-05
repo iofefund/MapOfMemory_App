@@ -34,6 +34,9 @@ public class MapPresenter extends AppMvpPresenter<MapView> {
         this.mapFragment = mapFragment;
     }
 
+    public List<MonumentEntity> getMonuments() {
+        return monuments;
+    }
 
     public void loadMonuments(){
         mDataManager.storIOSQLite

@@ -30,6 +30,7 @@ public class PlaceEntityAdapter extends RecyclerView.Adapter<PlaceEntityAdapter.
 
     public class PlaceHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.title) TextView titleView;
+        @BindView(R.id.descr) TextView descrView;
         @BindView(R.id.image) RoundedImageView imageView;
         @BindView(R.id.block) LinearLayout block;
         private Context context;
@@ -71,6 +72,7 @@ public class PlaceEntityAdapter extends RecyclerView.Adapter<PlaceEntityAdapter.
         PlaceEntity place = places.get(position);
         Picasso.with(holder.getContext()).load(place.getImgRoot() + place.getImg()).into(holder.imageView);
         holder.titleView.setText(place.getTitle());
+        holder.descrView.setText(place.getDescr());
         holder.block.setOnClickListener(v -> onPlaceClickListener.onClick(place));
     }
 

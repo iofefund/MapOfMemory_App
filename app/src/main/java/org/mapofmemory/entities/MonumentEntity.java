@@ -29,6 +29,10 @@ public class MonumentEntity {
     @SerializedName("id")
     @Expose
     private String id;
+    @StorIOSQLiteColumn(name = "real_name")
+    @SerializedName("real_name")
+    @Expose
+    private String realName;
     @SerializedName("id_relation")
     @Expose
     @StorIOSQLiteColumn(name = "id_relation")
@@ -69,12 +73,13 @@ public class MonumentEntity {
 
 
     @StorIOSQLiteCreator
-    MonumentEntity(int num, String id, int placeId, String idRelation, String name, String desc, String type, String lat, String lng, String type2, String imgs_json){
+    MonumentEntity(int num, String id, int placeId, String idRelation, String name, String realName, String desc, String type, String lat, String lng, String type2, String imgs_json){
         this.num = num;
         this.id = id;
         this.placeId = placeId;
         this.idRelation = idRelation;
         this.name = name;
+        this.realName = realName;
         this.desc = desc;
         this.type = type;
         this.lat = lat;
@@ -185,5 +190,13 @@ public class MonumentEntity {
         //Gson gson = new Gson();
         //Type teacherListType = new TypeToken<List<MonumentImgEntity>>(){}.getType();
         //this.imgs = gson.fromJson(imgs_json, teacherListType);
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
     }
 }

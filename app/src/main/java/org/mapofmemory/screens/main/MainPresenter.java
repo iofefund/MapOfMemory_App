@@ -23,7 +23,7 @@ import io.reactivex.schedulers.Schedulers;
 public class MainPresenter extends AppMvpPresenter<MainView> {
     private int placeId;
     private List<PlaceEntity> places;
-
+    private PlaceEntity currentPlace;
     public MainPresenter(Context context, int placeId){
         super(context);
         this.placeId = placeId;
@@ -39,7 +39,7 @@ public class MainPresenter extends AppMvpPresenter<MainView> {
                 .subscribeOn(Schedulers.io())
                 .map(places -> {
                     this.places = places;
-                    PlaceEntity currentPlace = Observable.fromIterable(places)
+                    currentPlace = Observable.fromIterable(places)
                             .filter(placeEntity -> placeEntity.getId() == placeId)
                             .blockingFirst();
                     return currentPlace;
@@ -59,5 +59,9 @@ public class MainPresenter extends AppMvpPresenter<MainView> {
 
     public int getPlaceId() {
         return placeId;
+    }
+
+    public PlaceEntity getCurrentPlace() {
+        return currentPlace;
     }
 }

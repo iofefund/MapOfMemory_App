@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by The Tronuo on 23.01.2018.
  */
@@ -29,5 +33,17 @@ public class AppConfig {
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return dp;
+    }
+
+    public static String convertDate(String currentDate){
+        DateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat targetFormat = new SimpleDateFormat("d MMMM yyyy");
+        try {
+            Date date = originalFormat.parse(currentDate);
+            return targetFormat.format(date);
+        }
+        catch (Exception e){
+            return "";
+        }
     }
 }

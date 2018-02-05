@@ -4,9 +4,15 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.mapofmemory.entities.AboutEntity;
+import org.mapofmemory.entities.AboutEntityTable;
+import org.mapofmemory.entities.DayOfMemory;
+import org.mapofmemory.entities.DayOfMemoryTable;
 import org.mapofmemory.entities.MonumentEntityTable;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.entities.PlaceEntityTable;
+import org.mapofmemory.entities.RouteEntity;
+import org.mapofmemory.entities.RouteEntityTable;
 
 /**
  * Created by The Tronuo on 25.01.2018.
@@ -14,16 +20,20 @@ import org.mapofmemory.entities.PlaceEntityTable;
 
 public class MapOfMemoryOpenHelper extends SQLiteOpenHelper {
     final private static String DATABASE_NAME = "Data";
-    final private static int DATABASE_VERSION = 13;
+    final private static int DATABASE_VERSION = 20;
 
     public MapOfMemoryOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         MonumentEntityTable.createTable(db);
         PlaceEntityTable.createTable(db);
+        DayOfMemoryTable.createTable(db);
+        AboutEntityTable.createTable(db);
+        RouteEntityTable.createTable(db);
     }
 
 
@@ -35,6 +45,10 @@ public class MapOfMemoryOpenHelper extends SQLiteOpenHelper {
         if (oldVersion != newVersion) {
             db.execSQL("DROP TABLE IF EXISTS " + MonumentEntityTable.NAME);
             db.execSQL("DROP TABLE IF EXISTS " + PlaceEntityTable.NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + DayOfMemoryTable.NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + AboutEntityTable.NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + RouteEntityTable.NAME);
+
             onCreate(db);
         }
         MonumentEntityTable.updateTable(db, oldVersion);

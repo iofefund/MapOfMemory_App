@@ -14,5 +14,9 @@ public interface MainView extends MvpView{
     void onPlacesLoad(List<PlaceEntity> places, PlaceEntity currentPlace);
     void onPlaceSelected(PlaceEntity place, int index);
     void onMapFragment(double lat, double lng);
+    void onAboutFragment(int placeId);
+    void onPersonsFragment(int placeId);
+    void onRouteFragment(int placeId);
+    void onDOMFragment(int placeId);
     void onSearchExpand();
 }

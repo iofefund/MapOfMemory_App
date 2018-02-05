@@ -29,12 +29,17 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
 
 import org.mapofmemory.R;
 import org.mapofmemory.entities.PlaceEntity;
+import org.mapofmemory.screens.about.AboutFragment;
+import org.mapofmemory.screens.dom.DOMFragment;
 import org.mapofmemory.screens.map.MapFragment;
+import org.mapofmemory.screens.names.NamesFragment;
+import org.mapofmemory.screens.route.RouteFragment;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -53,14 +58,14 @@ import io.reactivex.Observable;
 public class MainActivity extends MvpActivity<MainView, MainPresenter>
         implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.toolbar) Toolbar toolbar;
+    public @BindView(R.id.search_view) MaterialSearchView searchView;
     @BindView(R.id.frame)
     FrameLayout frame;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     private MaterialSpinner spinner;
     private TextView placeTitleView;
-    private DialogPlus dialogPlus;
-
+    private Menu menu;
     @NonNull
     @Override
     public MainPresenter createPresenter() {
@@ -74,6 +79,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setElevation(0);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -110,15 +116,15 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        this.menu = menu;
+        MenuItem item = menu.findItem(R.id.action_search);
+        searchView.setMenuItem(item);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_search){
-            ((MapFragment)getSupportFragmentManager().findFragmentById(R.id.frame)).search();
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -128,6 +134,26 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         int id = item.getItemId();
         if (id == R.id.nav_home){
             onBackPressed();
+        }
+        else if (id == R.id.nav_about){
+            menu.findItem(R.id.action_search).setVisible(false);
+            onAboutFragment(getPresenter().getPlaceId());
+        }
+        else if (id == R.id.nav_route){
+            menu.findItem(R.id.action_search).setVisible(false);
+            onRouteFragment(getPresenter().getPlaceId());
+        }
+        else if (id == R.id.nav_articles){
+            menu.findItem(R.id.action_search).setVisible(false);
+            onDOMFragment(getPresenter().getPlaceId());
+        }
+        else if (id == R.id.nav_monuments){
+            menu.findItem(R.id.action_search).setVisible(true);
+            getPresenter().loadPlaces();
+        }
+        else if (id == R.id.nav_names){
+            menu.findItem(R.id.action_search).setVisible(false);
+            onPersonsFragment(getPresenter().getPlaceId());
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -141,7 +167,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         }
         spinner.setPadding(0, 0, 0, 0);
         spinner.setItems(titles);
-        navigationView.getMenu().findItem(R.id.nav_about).setTitle("О " + currentPlace.getTitle());
+        navigationView.getMenu().findItem(R.id.nav_about).setTitle(currentPlace.getAboutTitle());
     }
 
     @Override
@@ -160,7 +186,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                navigationView.getMenu().findItem(R.id.nav_about).setTitle("О " + place.getTitle());
+                navigationView.getMenu().findItem(R.id.nav_about).setTitle(place.getAboutTitle());
             }
 
             @Override
@@ -173,10 +199,35 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     }
 
     @Override
+    public void onPersonsFragment(int placeId) {
+        getSupportActionBar().setTitle("Имена");
+        MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, NamesFragment.newInstance(getPresenter().getPlaceId())).commit();
+
+    }
+
+    @Override
+    public void onDOMFragment(int placeId) {
+        getSupportActionBar().setTitle("Дни памяти");
+        MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, DOMFragment.newInstance(getPresenter().getPlaceId())).commit();
+    }
+
+    @Override
     public void onMapFragment(double lat, double lng) {
+        getSupportActionBar().setTitle(getPresenter().getCurrentPlace().getTitle());
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, MapFragment.newInstance(getPresenter().getPlaceId(), lat, lng)).commit();
     }
 
+    @Override
+    public void onAboutFragment(int placeId) {
+        getSupportActionBar().setTitle(getPresenter().getCurrentPlace().getAboutTitle());
+        MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, AboutFragment.newInstance(placeId)).commit();
+    }
+
+    @Override
+    public void onRouteFragment(int placeId) {
+        getSupportActionBar().setTitle("Как добраться");
+        MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, RouteFragment.newInstance(placeId)).commit();
+    }
 
     @Override
     public void onSearchExpand() {

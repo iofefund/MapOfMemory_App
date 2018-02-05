@@ -28,6 +28,10 @@ public class PlaceEntity{
 	@StorIOSQLiteColumn(name = "about")
 	private String about;
 
+	@SerializedName("about_title")
+	@StorIOSQLiteColumn(name = "about_title")
+	private String aboutTitle;
+
 	@SerializedName("id")
 	@StorIOSQLiteColumn(name = "id", key = true)
 	private int id;
@@ -36,18 +40,39 @@ public class PlaceEntity{
 	@StorIOSQLiteColumn(name = "title")
 	private String title;
 
+	@SerializedName("descr")
+	@StorIOSQLiteColumn(name = "descr")
+	private String descr;
+
+	@SerializedName("dom_short")
+	@StorIOSQLiteColumn(name = "dom_short")
+	private String domShort;
+
+	@SerializedName("dom_detailed")
+	@StorIOSQLiteColumn(name = "dom_detailed")
+	private String domDetailed;
+
+	@SerializedName("dom_image")
+	@StorIOSQLiteColumn(name = "dom_image")
+	private String domImage;
+
 	PlaceEntity(){
 
 	}
 	@StorIOSQLiteCreator
-	PlaceEntity(int id, double lat, double lng, String title, String img, String imgRoot, String about){
+	PlaceEntity(int id, double lat, double lng, String title, String descr, String img, String imgRoot, String about, String aboutTitle, String domShort, String domDetailed, String domImage){
 		this.id = id;
 		this.lat = lat;
 		this.lng = lng;
 		this.title = title;
+		this.descr = descr;
 		this.img = img;
 		this.imgRoot = imgRoot;
 		this.about = about;
+		this.aboutTitle = aboutTitle;
+		this.domDetailed = domDetailed;
+		this.domImage = domImage;
+		this.domShort = domShort;
 	}
 
 	public void setLat(double lat) {
@@ -104,5 +129,45 @@ public class PlaceEntity{
 
 	public String getTitle(){
 		return title;
+	}
+
+	public void setAboutTitle(String aboutTitle) {
+		this.aboutTitle = aboutTitle;
+	}
+
+	public String getAboutTitle() {
+		return aboutTitle;
+	}
+
+	public void setDomDetailed(String domDetailed) {
+		this.domDetailed = domDetailed;
+	}
+
+	public String getDomDetailed() {
+		return domDetailed;
+	}
+
+	public void setDomImage(String domImage) {
+		this.domImage = domImage;
+	}
+
+	public String getDomImage() {
+		return domImage;
+	}
+
+	public void setDomShort(String domShort) {
+		this.domShort = domShort;
+	}
+
+	public String getDomShort() {
+		return domShort;
+	}
+
+	public void setDescr(String descr) {
+		this.descr = descr;
+	}
+
+	public String getDescr() {
+		return descr;
 	}
 }

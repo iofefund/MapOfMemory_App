@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
     <item
+        android:visible="false"
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
         android:title="Главная" />
@@ -14,6 +15,10 @@
         android:id="@+id/nav_monuments"
         android:icon="@drawable/ic_monument"
         android:title="Карта памятников" />
+    <item
+        android:id="@+id/nav_names"
+        android:icon="@drawable/ic_person"
+        android:title="Имена" />
     <item
         android:id="@+id/nav_articles"
         android:icon="@drawable/ic_article"

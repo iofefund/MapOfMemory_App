@@ -6,6 +6,14 @@ import com.pushtorefresh.storio3.sqlite.SQLiteTypeMapping;
 import com.pushtorefresh.storio3.sqlite.StorIOSQLite;
 import com.pushtorefresh.storio3.sqlite.impl.DefaultStorIOSQLite;
 
+import org.mapofmemory.entities.AboutEntity;
+import org.mapofmemory.entities.AboutEntityStorIOSQLiteDeleteResolver;
+import org.mapofmemory.entities.AboutEntityStorIOSQLiteGetResolver;
+import org.mapofmemory.entities.AboutEntityStorIOSQLitePutResolver;
+import org.mapofmemory.entities.DayOfMemory;
+import org.mapofmemory.entities.DayOfMemoryStorIOSQLiteDeleteResolver;
+import org.mapofmemory.entities.DayOfMemoryStorIOSQLiteGetResolver;
+import org.mapofmemory.entities.DayOfMemoryStorIOSQLitePutResolver;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.entities.MonumentEntityStorIOSQLiteDeleteResolver;
 import org.mapofmemory.entities.MonumentEntityStorIOSQLiteGetResolver;
@@ -15,10 +23,15 @@ import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.entities.PlaceEntityStorIOSQLiteDeleteResolver;
 import org.mapofmemory.entities.PlaceEntityStorIOSQLiteGetResolver;
 import org.mapofmemory.entities.PlaceEntityStorIOSQLitePutResolver;
+import org.mapofmemory.entities.RouteEntity;
+import org.mapofmemory.entities.RouteEntityStorIOSQLiteDeleteResolver;
+import org.mapofmemory.entities.RouteEntityStorIOSQLiteGetResolver;
+import org.mapofmemory.entities.RouteEntityStorIOSQLitePutResolver;
 
 import java.util.List;
 
 import io.reactivex.Single;
+import okhttp3.Route;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -57,6 +70,21 @@ public class DataManager {
                         .getResolver(new PlaceEntityStorIOSQLiteGetResolver())
                         .deleteResolver(new PlaceEntityStorIOSQLiteDeleteResolver())
                         .build())
+                .addTypeMapping(DayOfMemory.class, SQLiteTypeMapping.<DayOfMemory>builder()
+                        .putResolver(new DayOfMemoryStorIOSQLitePutResolver())
+                        .getResolver(new DayOfMemoryStorIOSQLiteGetResolver())
+                        .deleteResolver(new DayOfMemoryStorIOSQLiteDeleteResolver())
+                        .build())
+                .addTypeMapping(AboutEntity.class, SQLiteTypeMapping.<AboutEntity>builder()
+                        .putResolver(new AboutEntityStorIOSQLitePutResolver())
+                        .getResolver(new AboutEntityStorIOSQLiteGetResolver())
+                        .deleteResolver(new AboutEntityStorIOSQLiteDeleteResolver())
+                        .build())
+                .addTypeMapping(RouteEntity.class, SQLiteTypeMapping.<RouteEntity>builder()
+                        .putResolver(new RouteEntityStorIOSQLitePutResolver())
+                        .getResolver(new RouteEntityStorIOSQLiteGetResolver())
+                        .deleteResolver(new RouteEntityStorIOSQLiteDeleteResolver())
+                        .build())
                 .build();
         sharedPrefs = new SharedPrefs(context);
     }
@@ -67,5 +95,17 @@ public class DataManager {
 
     public Single<List<MonumentEntity>> getMonuments(){
         return restService.getMonuments();
+    }
+
+    public Single<AboutEntity> getAboutInfo(int placeId){
+        return restService.getAboutInfo(placeId);
+    }
+
+    public Single<RouteEntity> getRouteInfo(int placeId){
+        return restService.getRouteInfo(placeId);
+    }
+
+    public Single<List<DayOfMemory>> getDOM(int placeId){
+        return restService.getDOM(placeId);
     }
 }

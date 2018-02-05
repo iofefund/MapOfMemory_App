@@ -1,0 +1,33 @@
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<ImageView
+    android:id="@+id/icon"
+    android:background="@drawable/ic_bus"
+    android:layout_width="48dp"
+    android:layout_height="48dp" />
+    <LinearLayout
+        android:layout_marginLeft="20dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/header"
+            android:textColor="#313d4b"
+            android:textSize="17dp"
+            android:text="Как доехать на автобусе"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/message"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="13dp"
+            android:gravity="top"
+            android:text="
+Ежегодно 5 августа в Международные дни памяти в Сандормохе администрация Медвежьегорского района организует автобусы на мемориальное кладбище «Сандормох»"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>
