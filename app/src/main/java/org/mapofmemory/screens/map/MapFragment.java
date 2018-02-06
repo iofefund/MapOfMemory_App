@@ -37,6 +37,7 @@ import org.mapofmemory.adapters.SearchAdapter;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.main.MainActivity;
 import org.mapofmemory.screens.monument.MonumentActivity;
+import org.mapofmemory.screens.navigator.NavigatorActivity;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.DefaultOverlayManager;
@@ -126,9 +127,11 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     }
 
     List<Marker> markers = new ArrayList<>();
+    private int pos = 0;
 
     @Override
     public void onTabClicked(int position) {
+        pos = position;
         if (position == 0){
             showMonuments(getPresenter().getMonuments(), getPresenter().place.getImgRoot());
         }
@@ -149,30 +152,14 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     @Override
     public void showMonuments(List<MonumentEntity> monuments, String imgRoot) {
         //smartTabLayout.setVisibility(View.GONE);
+        for (Marker marker1 : markers){
+            if (marker1.isInfoWindowShown()) marker1.closeInfoWindow();
+        }
         markers.clear();
         map.getOverlays().clear();
         map.getOverlayManager().clear();
         this.monuments = monuments;
-        List<String> suggestions = Observable.fromIterable(monuments)
-                .filter(monumentEntity -> !monumentEntity.getRealName().isEmpty())
-                .map(monumentEntity -> monumentEntity.getRealName())
-                .toList()
-                .blockingGet();
-        ((MainActivity)activity).searchView.setAdapter(new SearchAdapter(activity, suggestions.toArray(new String[suggestions.size()])));
-        ((MainActivity)activity).searchView.setOnItemClickListener(((parent, view, position, id) -> {
-            TextView suggestion = (TextView) view.findViewById(R.id.suggestion_text);
-            MonumentEntity monument = Observable.fromIterable(getPresenter().getMonuments())
-                    .filter(monumentEntity -> monumentEntity.getRealName().equals(suggestion.getText().toString()))
-                    .blockingFirst();
-            ((MainActivity)activity).searchView.dismissSuggestions();
-            ((MainActivity)activity).searchView.hideKeyboard(((MainActivity)activity).searchView);
-            Observable.just(1)
-                    .delay(200, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(res ->{
-                        onMarkerClick(Observable.fromIterable(markers).filter(marker -> marker.getTitle().equals("Marker" + monument.getId())).blockingFirst(), map);
-                    });
-        }));
+        initSearchView();
         map.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         Flowable.fromIterable(monuments)
@@ -184,17 +171,28 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                         startMarker.setPosition(startPoint);
                         startMarker.setTitle("Marker" + monumentEntity.getId());
                         MonumentInfoWindow monumentInfoWindow = new MonumentInfoWindow(map, monumentEntity.getImgs().size() != 0 ? imgRoot + monumentEntity.getImgs().get(0).getImg() : "", monumentEntity);
-                        monumentInfoWindow.setOnWindowClickListener(window -> {
-                            ImageView image = window.getImage();
-                            ActivityOptionsCompat options =
-                                    ActivityOptionsCompat.makeClipRevealAnimation(image, (int)image.getX(), (int)image.getY(), image.getWidth(), image.getHeight());
-                            Intent newInt = new Intent(getContext(), MonumentActivity.class);
-                            newInt.putExtra("monument_id", monumentEntity.getNum() + "");
-                            newInt.putExtra("image_url", window.getImageUrl());
-                            newInt.putExtra("name", monumentEntity.getName());
-                            newInt.putExtra("type2", monumentEntity.getType2());
-                            newInt.putExtra("descr", monumentEntity.getDesc());
-                            startActivity(newInt, options.toBundle());
+                        monumentInfoWindow.setOnWindowClickListener(new MonumentInfoWindow.OnWindowClickListener() {
+                            @Override
+                            public void onWindowClick(MonumentInfoWindow window) {
+                                ImageView image = window.getImage();
+                                ActivityOptionsCompat options =
+                                        ActivityOptionsCompat.makeClipRevealAnimation(image, (int)image.getX(), (int)image.getY(), image.getWidth(), image.getHeight());
+                                Intent newInt = new Intent(getContext(), MonumentActivity.class);
+                                newInt.putExtra("monument_id", monumentEntity.getNum() + "");
+                                newInt.putExtra("image_url", window.getImageUrl());
+                                newInt.putExtra("name", monumentEntity.getName());
+                                newInt.putExtra("type2", monumentEntity.getType2());
+                                newInt.putExtra("descr", monumentEntity.getDesc());
+                                startActivity(newInt, options.toBundle());
+                            }
+
+                            @Override
+                            public void onButtonClick(MonumentInfoWindow window) {
+                                Intent newInt = new Intent(getContext(), NavigatorActivity.class);
+                                newInt.putExtra("monument_id", monumentEntity.getNum() + "");
+                                newInt.putExtra("from_map", "");
+                                startActivity(newInt);
+                            }
                         });
                         startMarker.setInfoWindow(monumentInfoWindow);
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
@@ -210,25 +208,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                     map.invalidate();
                     map.setVisibility(View.VISIBLE);
                     smartTabLayout.setVisibility(View.VISIBLE);
-                    setupRecyclerView(monumentEntities);
                 });
-    }
-    private void setupRecyclerView(List<MonumentEntity> monuments){
-        RecyclerView recyclerView = (RecyclerView)dialogPlus.getHolderView().findViewById(R.id.recyclerView);
-        MonumentEntityAdapter adapter = new MonumentEntityAdapter(monuments);
-        adapter.setOnPlaceClickListener((monument, index) -> {
-            dialogPlus.dismiss();
-            onMarkerClick(Observable.fromIterable(markers).filter(marker -> marker.getTitle().equals("Marker" + monument.getId())).blockingFirst(), map);
-        });
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-    }
-
-
-    @Override
-    public void showSearch(List<MonumentEntity> monuments) {
-
-
     }
 
     @Override
@@ -241,6 +221,44 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         map.getController().setCenter(new GeoPoint(marker.getPosition().getLatitude(), marker.getPosition().getLongitude()));
         map.invalidate();
         return true;
+    }
+
+    public void initSearchView(){
+        List<String> suggestions = Observable.fromIterable(monuments)
+                .filter(monumentEntity -> !monumentEntity.getRealName().isEmpty() || !monumentEntity.getName().isEmpty())
+                .map(monumentEntity -> monumentEntity.getType().equals("1") ? monumentEntity.getRealName() : monumentEntity.getName())
+                .toList()
+                .blockingGet();
+        ((MainActivity)activity).searchView.setAdapter(new SearchAdapter(activity, suggestions.toArray(new String[suggestions.size()])));
+        ((MainActivity)activity).searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                onTabClicked(pos);
+            }
+        });
+        ((MainActivity)activity).searchView.setOnItemClickListener(((parent, view, position, id) -> {
+            TextView suggestion = (TextView) view.findViewById(R.id.suggestion_text);
+            MonumentEntity monument = Observable.fromIterable(getPresenter().getMonuments())
+                    .filter(monumentEntity -> monumentEntity.getType2().equals("1") ? monumentEntity.getRealName().equals(suggestion.getText().toString()) : monumentEntity.getName().equals(suggestion.getText().toString()))
+                    .blockingFirst();
+            ((MainActivity)activity).searchView.dismissSuggestions();
+            ((MainActivity)activity).searchView.hideKeyboard(((MainActivity)activity).searchView);
+            Observable.just(1)
+                    .delay(100, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(res ->{
+                        List<MonumentEntity> m = new ArrayList<>();
+                        m.add(monument);
+                        showMonuments(m, getPresenter().place.getImgRoot());
+                        ((MainActivity)activity).searchView.dismissSuggestions();
+                        //onMarkerClick(Observable.fromIterable(markers).filter(marker -> marker.getTitle().equals("Marker" + monument.getId())).blockingFirst(), map);
+                    });
+        }));
     }
 
     public static MapFragment newInstance(int placeId, double lat, double lng) {

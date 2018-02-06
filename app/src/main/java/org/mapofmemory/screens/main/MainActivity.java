@@ -109,7 +109,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-           //super.onBackPressed();
+           super.onBackPressed();
         }
     }
 
@@ -133,7 +133,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.nav_home){
-            onBackPressed();
+            super.onBackPressed();
         }
         else if (id == R.id.nav_about){
             menu.findItem(R.id.action_search).setVisible(false);
@@ -194,7 +194,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
 
             }
         });
-        getSupportActionBar().setTitle(place.getTitle());
+        getSupportActionBar().setTitle("Карта памятников");
         onMapFragment(place.getLat(), place.getLng());
     }
 
@@ -213,7 +213,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
 
     @Override
     public void onMapFragment(double lat, double lng) {
-        getSupportActionBar().setTitle(getPresenter().getCurrentPlace().getTitle());
+        getSupportActionBar().setTitle("Карта памятников");
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, MapFragment.newInstance(getPresenter().getPlaceId(), lat, lng)).commit();
     }
 

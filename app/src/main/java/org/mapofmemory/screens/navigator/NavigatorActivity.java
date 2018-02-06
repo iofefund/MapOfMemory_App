@@ -83,7 +83,12 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getPresenter().loadMonument();
-        getSupportActionBar().setTitle("Назад к описанию");
+        if (getIntent().hasExtra("from_map")){
+            getSupportActionBar().setTitle("Назад к карте");
+        }
+        else{
+            getSupportActionBar().setTitle("Назад к описанию");
+        }
     }
 
     @Override

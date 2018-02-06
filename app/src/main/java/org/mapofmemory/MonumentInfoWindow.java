@@ -19,6 +19,7 @@ import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
  * Created by The Tronuo on 28.01.2018.
@@ -28,6 +29,8 @@ public class MonumentInfoWindow extends InfoWindow {
     @BindView(R.id.image) ImageView image;
     @BindView(R.id.title) TextView title;
     @BindView(R.id.type) TextView type;
+    @BindView(R.id.btn_route) FancyButton fancyButton;
+
     private String imageUrl = "";
     private MonumentEntity monument;
     public MonumentInfoWindow(MapView mapView, String imageUrl, MonumentEntity monument) {
@@ -51,11 +54,13 @@ public class MonumentInfoWindow extends InfoWindow {
         if (!imageUrl.isEmpty()) Picasso.with(image.getContext()).load(imageUrl).error(R.drawable.no_photo).into(image);
         title.setText(monument.getName());
         type.setText(monument.getType2());
-        getView().setOnClickListener(v -> onWindowClickListener.onClick(this));
+        getView().setOnClickListener(v -> onWindowClickListener.onWindowClick(this));
+        fancyButton.setOnClickListener(v -> onWindowClickListener.onButtonClick(this));
     }
 
     public interface OnWindowClickListener{
-        void onClick(MonumentInfoWindow window);
+        void onWindowClick(MonumentInfoWindow window);
+        void onButtonClick(MonumentInfoWindow window);
     }
     private OnWindowClickListener onWindowClickListener;
 

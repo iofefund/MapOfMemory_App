@@ -3,10 +3,12 @@
     android:padding="10dp"
     android:elevation="8dp"
     android:background="@drawable/info_window"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="230dp"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -46,13 +48,23 @@
         android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-        <TextView
+        <mehdi.sakout.fancybuttons.FancyButton
+            android:id="@+id/btn_route"
             android:layout_marginTop="5dp"
-            android:id="@+id/detail"
-            android:text="Подробнее..."
-            android:textSize="12dp"
-            android:textColor="@android:color/holo_red_dark"
+            android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
+            fancy:fb_borderColor="#FFFFFF"
+            fancy:fb_borderWidth="1dp"
+            fancy:fb_defaultColor="@android:color/holo_red_light"
+            fancy:fb_focusColor="@android:color/holo_red_dark"
+            fancy:fb_radius="15dp"
+            fancy:fb_textSize="12dp"
+            fancy:fb_text="Проложить маршрут"
+            fancy:fb_textColor="#FFFFFF" />
     </LinearLayout>
 </LinearLayout>

@@ -17,15 +17,21 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import org.mapofmemory.FileManager;
 import org.mapofmemory.R;
 import org.mapofmemory.adapters.PlaceEntityAdapter;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.screens.main.MainActivity;
 
+import java.io.File;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implements MenuView, PermissionListener {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
@@ -72,7 +78,21 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
     @Override
     public void onDataSuccess(String date) {
         status.setText("Данные обновлены\n" + date);
-        isDataUpdated = true;
+        //
+        if (isGranted) {
+            Observable.just(1)
+                    .subscribeOn(Schedulers.io())
+                    .filter(res -> {
+                        FileManager fileManager = new FileManager(getAssets());
+                        fileManager.copyFileIfNeeded("cache.db");
+                        return true;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(res -> {
+                        isDataUpdated = true;
+                    });
+        }
+        // isDataUpdated = true;
         //Toast.makeText(this, "Данные обновлены!", Toast.LENGTH_SHORT).show();
     }
 
@@ -84,6 +104,17 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
     @Override
     public void onPermissionGranted(PermissionGrantedResponse response) {
         isGranted = true;
+        Observable.just(1)
+                .subscribeOn(Schedulers.io())
+                .filter(res -> {
+                    FileManager fileManager = new FileManager(getAssets());
+                    fileManager.copyFileIfNeeded("cache.db");
+                    return true;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    isDataUpdated = true;
+                });
     }
 
     @Override

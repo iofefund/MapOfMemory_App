@@ -66,8 +66,4 @@ public class MapPresenter extends AppMvpPresenter<MapView> {
         super.attachView(view);
 
     }
-
-    public void showSearch(){
-        getView().showSearch(monuments);
-    }
 }
