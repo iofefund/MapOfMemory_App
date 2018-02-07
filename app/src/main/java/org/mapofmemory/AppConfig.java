@@ -6,7 +6,10 @@ import android.util.DisplayMetrics;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by The Tronuo on 23.01.2018.
@@ -45,5 +48,14 @@ public class AppConfig {
         catch (Exception e){
             return "";
         }
+    }
+    public static List<String> removeTheDuplicates(List<String> myList) {
+        for(ListIterator<String> iterator = myList.listIterator(); iterator.hasNext();) {
+            String str = iterator.next();
+            if(Collections.frequency(myList, str) > 1) {
+                iterator.remove();
+            }
+        }
+        return myList;
     }
 }

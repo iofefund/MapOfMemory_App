@@ -30,6 +30,7 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
 
+import org.mapofmemory.AppConfig;
 import org.mapofmemory.MonumentInfoWindow;
 import org.mapofmemory.R;
 import org.mapofmemory.adapters.MonumentEntityAdapter;
@@ -46,8 +47,10 @@ import org.osmdroid.views.overlay.TilesOverlay;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import butterknife.BindDrawable;
 import butterknife.BindView;
@@ -229,6 +232,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                 .map(monumentEntity -> monumentEntity.getType().equals("1") ? monumentEntity.getRealName() : monumentEntity.getName())
                 .toList()
                 .blockingGet();
+        suggestions = AppConfig.removeTheDuplicates(suggestions);
         ((MainActivity)activity).searchView.setAdapter(new SearchAdapter(activity, suggestions.toArray(new String[suggestions.size()])));
         ((MainActivity)activity).searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
@@ -243,17 +247,18 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         });
         ((MainActivity)activity).searchView.setOnItemClickListener(((parent, view, position, id) -> {
             TextView suggestion = (TextView) view.findViewById(R.id.suggestion_text);
-            MonumentEntity monument = Observable.fromIterable(getPresenter().getMonuments())
-                    .filter(monumentEntity -> monumentEntity.getType2().equals("1") ? monumentEntity.getRealName().equals(suggestion.getText().toString()) : monumentEntity.getName().equals(suggestion.getText().toString()))
-                    .blockingFirst();
+            List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
+                    .filter(monumentEntity -> {
+                        return monumentEntity.getType().equals("1") ? monumentEntity.getRealName().equals(suggestion.getText().toString()) : monumentEntity.getName().equals(suggestion.getText().toString());
+                    })
+                    .toList()
+                    .blockingGet();
             ((MainActivity)activity).searchView.dismissSuggestions();
             ((MainActivity)activity).searchView.hideKeyboard(((MainActivity)activity).searchView);
             Observable.just(1)
                     .delay(100, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(res ->{
-                        List<MonumentEntity> m = new ArrayList<>();
-                        m.add(monument);
                         showMonuments(m, getPresenter().place.getImgRoot());
                         ((MainActivity)activity).searchView.dismissSuggestions();
                         //onMarkerClick(Observable.fromIterable(markers).filter(marker -> marker.getTitle().equals("Marker" + monument.getId())).blockingFirst(), map);
