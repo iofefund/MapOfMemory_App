@@ -27,8 +27,11 @@ import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import org.mapofmemory.R;
 import org.mapofmemory.entities.MonumentEntity;
@@ -108,22 +111,26 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         mapView.invalidate();
         mapView.setVisibility(View.VISIBLE);
         Dexter.withActivity(this)
-                .withPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(new MultiplePermissionsListener() {
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
                     @Override
-                    public void onPermissionsChecked(MultiplePermissionsReport report) {
-                        if (report.areAllPermissionsGranted()){
-                            isPermission = true;
-                            LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1 * 1000,
-                                    0, NavigatorActivity.this);
-                            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1 * 1000,
-                                    0, NavigatorActivity.this);
-                        }
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1 * 1000,
+                                0, NavigatorActivity.this);
+                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1 * 1000,
+                                0, NavigatorActivity.this);
+                        mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 1 * 1000,
+                                0, NavigatorActivity.this);
                     }
 
                     @Override
-                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
 
                     }
                 })
