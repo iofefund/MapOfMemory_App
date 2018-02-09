@@ -35,6 +35,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 
 import org.mapofmemory.R;
 import org.mapofmemory.entities.MonumentEntity;
+import org.mapofmemory.screens.main.MainActivity;
 import org.mapofmemory.screens.monument.MonumentView;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
@@ -52,11 +53,13 @@ import java.util.List;
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
+import io.nlopez.smartlocation.SmartLocation;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPresenter> implements NavigatorView, LocationListener{
+public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPresenter> implements NavigatorView, OnLocationUpdatedListener{
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.map_view) MapView mapView;
     @BindDrawable(R.drawable.ic_blue_marker) Drawable blueMarker;
@@ -115,13 +118,9 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
-                        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                        mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1 * 1000,
-                                0, NavigatorActivity.this);
-                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1 * 1000,
-                                0, NavigatorActivity.this);
-                        mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 1 * 1000,
-                                0, NavigatorActivity.this);
+                        SmartLocation.with(getApplicationContext()).location()
+                                .start(NavigatorActivity.this);
+                        Toast.makeText(getApplicationContext(), "SmartLocation is running!", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -135,6 +134,11 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                     }
                 })
                 .check();
+    }
+
+    @Override
+    public void onLocationUpdated(Location location) {
+        updateMap(location.getLatitude(), location.getLongitude());
     }
 
     private void updateMap(double userLat, double userLng){
@@ -191,27 +195,6 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                     mapView.getOverlays().add(roadOverlay);
                     mapView.invalidate();
                 });*/
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        updateMap(location.getLatitude(), location.getLongitude());
-        //updateMap(62.88785, 34.68005);
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
     }
 
 }

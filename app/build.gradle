@@ -85,5 +85,6 @@ dependencies {
     compile 'com.simplecityapps:recyclerview-fastscroll:1.0.17'
     compile 'de.hdodenhof:circleimageview:2.2.0'
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
+    compile 'io.nlopez.smartlocation:library:3.3.3'
 
 }
