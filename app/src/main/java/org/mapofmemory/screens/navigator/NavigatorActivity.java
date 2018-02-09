@@ -55,6 +55,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
+import io.nlopez.smartlocation.location.config.LocationParams;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -118,7 +119,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
-                        SmartLocation.with(getApplicationContext()).location()
+                        SmartLocation.with(getApplicationContext()).location().config(LocationParams.NAVIGATION)
                                 .start(NavigatorActivity.this);
                         Toast.makeText(getApplicationContext(), "SmartLocation is running!", Toast.LENGTH_LONG).show();
                     }
@@ -142,6 +143,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
     }
 
     private void updateMap(double userLat, double userLng){
+                Location loc1 = new Location("");
         final GeoPoint endPoint = new GeoPoint(Float.parseFloat(getPresenter().getMonument().getLat()), Float.parseFloat(getPresenter().getMonument().getLng()));
         Marker monumentMarker = new Marker(mapView);
         monumentMarker.setPosition(endPoint);
@@ -157,28 +159,53 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
 
         mapView.getOverlays().add(userMarker);
         mapView.getOverlays().add(monumentMarker);
-        Location loc1 = new Location("");
-
         loc1.setLatitude(userLat);
         loc1.setLongitude(userLng);
 
         Location loc2 = new Location("");
         loc2.setLatitude(Double.parseDouble(getPresenter().getMonument().getLat()));
         loc2.setLongitude(Double.parseDouble(getPresenter().getMonument().getLng()));
-        distance.setText((int)loc1.distanceTo(loc2) + " м");
-        distanceBlock.setVisibility(View.VISIBLE);
+        int distanceTo = (int)loc1.distanceTo(loc2);
+        if (distanceTo >= 2000){
+            Observable.just(1)
+                    .subscribeOn(Schedulers.io())
+                    .map(res -> {
+                        RoadManager roadManager = new OSRMRoadManager(getApplicationContext());
+                        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+                        waypoints.add(new GeoPoint(userLat, userLng));
+                        waypoints.add(endPoint);
+                        Road road = roadManager.getRoad(waypoints);
+                        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+                        return roadOverlay;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(roadOverlay -> {
+                        mapView.getOverlays().add(roadOverlay);
+                        //mapView.invalidate();
+                        mapView.getController().setCenter(new GeoPoint(userLat, userLng));
+                        mapView.getController().setZoom(16);
+                        mapView.invalidate();
+                        distance.setText(distanceTo + " м");
+                        distanceBlock.setVisibility(View.VISIBLE);
+                    });
+        }
+        else{
+            Polyline line = new Polyline(getApplicationContext());
+            line.setWidth(8f);
+            line.setColor(Color.RED);
+            List<GeoPoint> pts = new ArrayList<>();
+            pts.add(new GeoPoint(userLat, userLng));
+            pts.add(new GeoPoint(Double.parseDouble(getPresenter().getMonument().getLat()), Double.parseDouble(getPresenter().getMonument().getLng())));
+            line.setPoints(pts);
+            mapView.getOverlayManager().add(line);
+            mapView.invalidate();
+            distance.setText(distanceTo + " м");
+            distanceBlock.setVisibility(View.VISIBLE);
+        }
         //Toast.makeText(this, loc1.distanceTo(loc2) + " meters", Toast.LENGTH_SHORT).show();
         //mapView.getController().setZoom(12);
         //mapView.getController().setCenter(new GeoPoint(userLat, userLng));
-        Polyline line = new Polyline(getApplicationContext());
-        line.setWidth(8f);
-        line.setColor(Color.RED);
-        List<GeoPoint> pts = new ArrayList<>();
-        pts.add(new GeoPoint(userLat, userLng));
-        pts.add(new GeoPoint(Double.parseDouble(getPresenter().getMonument().getLat()), Double.parseDouble(getPresenter().getMonument().getLng())));
-        line.setPoints(pts);
-        mapView.getOverlayManager().add(line);
-        mapView.invalidate();
+
        /* Observable.just(1)
                 .subscribeOn(Schedulers.io())
                 .map(res -> {
