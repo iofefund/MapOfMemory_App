@@ -26,6 +26,10 @@ public class DOMPresenter extends AppMvpPresenter<DOMView> {
     private int placeId;
     private PlaceEntity placeEntity;
 
+    public PlaceEntity getPlaceEntity() {
+        return placeEntity;
+    }
+
     public DOMPresenter(Context context, int placeId){
         super(context);
         this.placeId = placeId;

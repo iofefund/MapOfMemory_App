@@ -20,7 +20,7 @@ import org.mapofmemory.entities.RouteEntityTable;
 
 public class MapOfMemoryOpenHelper extends SQLiteOpenHelper {
     final private static String DATABASE_NAME = "Data";
-    final private static int DATABASE_VERSION = 20;
+    final private static int DATABASE_VERSION = 21;
 
     public MapOfMemoryOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

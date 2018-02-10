@@ -39,6 +39,10 @@ public class MonumentInfoWindow extends InfoWindow {
         this.monument = monument;
     }
 
+    public void hideBtn(){
+        fancyButton.setVisibility(View.GONE);
+    }
+
     public ImageView getImage() {
         return image;
     }

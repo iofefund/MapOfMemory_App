@@ -9,5 +9,5 @@ import org.mapofmemory.entities.MonumentEntity;
  */
 
 public interface NavigatorView extends MvpView {
-    void onLoadMonument(MonumentEntity monumentEntity);
+    void onLoadMonument(MonumentEntity monumentEntity, String imgRoot);
 }

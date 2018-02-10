@@ -40,6 +40,7 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
     @BindView(R.id.image) ImageView image;
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.text) TextView text;
+    @BindView(R.id.name) TextView name;
     @BindView(R.id.type) TextView type;
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout toolbarLayout;
     @BindView(R.id.map_view) MapView mapView;
@@ -68,12 +69,13 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
     public void onLoadMonument(MonumentEntity monumentEntity) {
         if (!getIntent().hasExtra("name")) {
             text.setText(Html.fromHtml(monumentEntity.getDesc()));
+            name.setText(monumentEntity.getName());
             if (!monumentEntity.getType2().isEmpty()) {
                 type.setText(monumentEntity.getType2());
             } else {
                 type.setVisibility(View.GONE);
             }
-            toolbarLayout.setTitle(monumentEntity.getName());
+            toolbarLayout.setTitle("Назад к именам");
         }
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setMaxZoomLevel(19);
@@ -122,7 +124,8 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
             } else {
                 type.setVisibility(View.GONE);
             }
-            toolbarLayout.setTitle(getIntent().getStringExtra("name"));
+            toolbarLayout.setTitle("Назад к карте");
+            name.setText(getIntent().getStringExtra("name"));
         }
         getPresenter().loadMonument();
     }

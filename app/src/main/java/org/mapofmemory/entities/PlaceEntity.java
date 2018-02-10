@@ -20,6 +20,10 @@ public class PlaceEntity{
 	@StorIOSQLiteColumn(name = "img")
 	private String img;
 
+	@SerializedName("url")
+	@StorIOSQLiteColumn(name = "url")
+	private String url;
+
 	@SerializedName("img_root")
 	@StorIOSQLiteColumn(name = "img_root")
 	private String imgRoot;
@@ -60,19 +64,28 @@ public class PlaceEntity{
 
 	}
 	@StorIOSQLiteCreator
-	PlaceEntity(int id, double lat, double lng, String title, String descr, String img, String imgRoot, String about, String aboutTitle, String domShort, String domDetailed, String domImage){
+	PlaceEntity(int id, double lat, double lng, String title, String descr, String img, String url, String imgRoot, String about, String aboutTitle, String domShort, String domDetailed, String domImage){
 		this.id = id;
 		this.lat = lat;
 		this.lng = lng;
 		this.title = title;
 		this.descr = descr;
 		this.img = img;
+		this.url = url;
 		this.imgRoot = imgRoot;
 		this.about = about;
 		this.aboutTitle = aboutTitle;
 		this.domDetailed = domDetailed;
 		this.domImage = domImage;
 		this.domShort = domShort;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getUrl() {
+		return url;
 	}
 
 	public void setLat(double lat) {

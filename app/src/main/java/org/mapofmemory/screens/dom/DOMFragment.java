@@ -1,5 +1,7 @@
 package org.mapofmemory.screens.dom;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
@@ -25,7 +27,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
+import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
  * Created by The Tronuo on 04.02.2018.
@@ -40,6 +44,15 @@ public class DOMFragment extends MvpFragment<DOMView, DOMPresenter> implements D
     @BindView(R.id.future_dom_title) TextView futureDomTitle;
     @BindView(R.id.viewpager) ViewPager viewPager;
     @BindView(R.id.dom_block) LinearLayout domBlock;
+    @OnClick(R.id.btn_write) void onWrite(){
+        try{
+            Intent intent= new Intent(Intent.ACTION_VIEW, Uri.parse(getPresenter().getPlaceEntity().getUrl()));
+            startActivity(intent);
+        }
+        catch (Exception e){
+
+        }
+    }
     @BindView(R.id.progress) ProgressBar progressBar;
     @BindView(R.id.nested) NestedScrollView nestedScrollView;
 

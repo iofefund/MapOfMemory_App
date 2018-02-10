@@ -52,7 +52,7 @@ public class NamesFragment extends MvpFragment<NamesView, NamesPresenter> implem
     public void onPersonLoad(List<PersonInfo> persons) {
         progressBar.setVisibility(View.GONE);
         PersonAdapter personAdapter = new PersonAdapter(persons);
-        personAdapter.setOnPlaceClickListener(personInfo -> {
+        personAdapter.setOnPersonClickListener(personInfo -> {
             Intent newInt = new Intent(getActivity(), MonumentActivity.class);
             newInt.putExtra("monument_id", personInfo.getNum() + "");
             newInt.putExtra("image_url", personInfo.getImage());

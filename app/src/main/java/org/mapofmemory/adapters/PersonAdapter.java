@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import com.squareup.picasso.Picasso;
 
@@ -17,11 +18,13 @@ import org.mapofmemory.R;
 import org.mapofmemory.entities.PersonInfo;
 import org.mapofmemory.entities.RouteInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.reactivex.Observable;
 
 /**
  * Created by The Tronuo on 21.01.2018.
@@ -75,7 +78,32 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonHold
         if (personInfo.getName().contains("\n")){
             holder.name.setMaxLines(2);
         }
-        holder.v.setOnClickListener(v -> onPersonClickListener.onClick(personInfo));
+        if (personInfo.getInners().size() >= 1){
+            holder.v.setOnClickListener(v -> {
+                PersonAdapter personAdapter = new PersonAdapter(Observable.fromIterable(personInfo.getInners())
+                        .map(person -> {
+                            person.setName(person.getType());
+                            person.setInners(new ArrayList<>());
+                            return person;
+                        })
+                        .toList()
+                        .blockingGet());
+                MaterialDialog mDialog = new MaterialDialog.Builder(holder.getContext())
+                        .adapter(personAdapter, null)
+                        .show();
+                personAdapter.setOnPersonClickListener(x ->{
+                    //mDialog.dismiss();
+                    PersonInfo p = new PersonInfo();
+                    p.setName(x.getName());
+                    p.setNum(x.getNum());
+                    p.setImage(x.getImage());
+                    onPersonClickListener.onClick(p);
+                });
+            });
+        }
+        else{
+            holder.v.setOnClickListener(v -> onPersonClickListener.onClick(personInfo));
+        }
         holder.name.setText(personInfo.getName());
     }
 
@@ -89,7 +117,7 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonHold
         void onClick(PersonInfo personInfo);
     }
 
-    public void setOnPlaceClickListener(OnPersonClickListener onPersonClickListener) {
+    public void setOnPersonClickListener(OnPersonClickListener onPersonClickListener) {
         this.onPersonClickListener = onPersonClickListener;
     }
 }

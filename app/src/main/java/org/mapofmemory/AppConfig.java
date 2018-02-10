@@ -4,12 +4,19 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
+import org.mapofmemory.entities.MonumentEntity;
+import org.mapofmemory.entities.PersonInfo;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
+
+import io.reactivex.Observable;
 
 /**
  * Created by The Tronuo on 23.01.2018.
@@ -49,6 +56,7 @@ public class AppConfig {
             return "";
         }
     }
+
     public static List<String> removeTheDuplicates(List<String> myList) {
         for(ListIterator<String> iterator = myList.listIterator(); iterator.hasNext();) {
             String str = iterator.next();
@@ -57,5 +65,41 @@ public class AppConfig {
             }
         }
         return myList;
+    }
+
+    public static List<PersonInfo> removePersonDuplicates(List<PersonInfo> personInfos) {
+        List<String> res = new ArrayList<>();
+        List<PersonInfo> persons = new ArrayList<>();
+        for (PersonInfo person : personInfos){
+            if (!res.contains(person.getName())){
+                res.add(person.getName());
+                persons.add(person);
+            }
+        }
+        return persons;
+    }
+
+    public static List<String> getDuplicates(List<PersonInfo> myList) {
+        List<String> res = new ArrayList<>();
+        List<String> persons = Observable.fromIterable(myList)
+                .map(personInfo -> personInfo.getName())
+                .toList()
+                .blockingGet();
+        for(ListIterator<String> iterator = persons.listIterator(); iterator.hasNext();) {
+            String str = iterator.next();
+            if(Collections.frequency(persons, str) >= 2) {
+                res.add(str);
+            }
+        }
+        return removeTheDuplicates(res);
+    }
+
+    public static int findPersonInfoByName(List<PersonInfo> personInfos, String name) {
+        int index = -1;
+        for (int i = 0; i <= personInfos.size() - 1; i++){
+            if (personInfos.get(i).getName().equals(name)) return i;
+        }
+        return index;
+
     }
 }

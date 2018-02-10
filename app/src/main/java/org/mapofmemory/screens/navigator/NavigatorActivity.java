@@ -33,6 +33,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import org.mapofmemory.MonumentInfoWindow;
 import org.mapofmemory.R;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.main.MainActivity;
@@ -60,7 +61,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPresenter> implements NavigatorView, OnLocationUpdatedListener{
+public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPresenter> implements NavigatorView, OnLocationUpdatedListener, Marker.OnMarkerClickListener{
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.map_view) MapView mapView;
     @BindDrawable(R.drawable.ic_blue_marker) Drawable blueMarker;
@@ -99,18 +100,30 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
     }
 
     @Override
-    public void onLoadMonument(MonumentEntity monumentEntity) {
+    public void onLoadMonument(MonumentEntity monumentEntity, String imgRoot) {
         mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.setMaxZoomLevel(18);
+        mapView.setMaxZoomLevel(19);
         mapView.setMultiTouchControls(true);
         final GeoPoint startPoint = new GeoPoint(Float.parseFloat(monumentEntity.getLat()), Float.parseFloat(monumentEntity.getLng()));
         Marker startMarker = new Marker(mapView);
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
-        startMarker.setInfoWindow(null);
         startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
+        MonumentInfoWindow monumentInfoWindow = new MonumentInfoWindow(mapView, getPresenter().getMonument().getImgs().size() != 0 ? imgRoot + getPresenter().getMonument().getImgs().get(0).getImg() : "", getPresenter().getMonument());
+        monumentInfoWindow.setOnWindowClickListener(new MonumentInfoWindow.OnWindowClickListener() {
+            @Override
+            public void onWindowClick(MonumentInfoWindow window) {
+
+            }
+
+            @Override
+            public void onButtonClick(MonumentInfoWindow window) {
+
+            }
+        });
+        startMarker.setInfoWindow(monumentInfoWindow);
         mapView.getOverlays().add(startMarker);
-        mapView.getController().setZoom(18);
+        mapView.getController().setZoom(19);
         mapView.getController().setCenter(startPoint);
         mapView.invalidate();
         mapView.setVisibility(View.VISIBLE);
@@ -121,7 +134,6 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                     public void onPermissionGranted(PermissionGrantedResponse response) {
                         SmartLocation.with(getApplicationContext()).location().config(LocationParams.NAVIGATION)
                                 .start(NavigatorActivity.this);
-                        Toast.makeText(getApplicationContext(), "SmartLocation is running!", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -142,6 +154,20 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         updateMap(location.getLatitude(), location.getLongitude());
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker, MapView mapView) {
+        if (marker.isInfoWindowOpen()){
+            marker.closeInfoWindow();
+        }
+        else{
+            marker.showInfoWindow();
+        }
+        mapView.getController().setZoom(19);
+        mapView.getController().setCenter(new GeoPoint(marker.getPosition().getLatitude(), marker.getPosition().getLongitude()));
+        mapView.invalidate();
+        return true;
+    }
+
     private void updateMap(double userLat, double userLng){
                 Location loc1 = new Location("");
         final GeoPoint endPoint = new GeoPoint(Float.parseFloat(getPresenter().getMonument().getLat()), Float.parseFloat(getPresenter().getMonument().getLng()));
@@ -149,7 +175,22 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         monumentMarker.setPosition(endPoint);
         monumentMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
         monumentMarker.setIcon(getPresenter().getMonument().getType().equals("1") ? redMarker : blueMarker);
-        monumentMarker.setInfoWindow(null);
+        monumentMarker.setOnMarkerClickListener(this);
+        MonumentInfoWindow monumentInfoWindow = new MonumentInfoWindow(mapView, getPresenter().getMonument().getImgs().size() != 0 ? getPresenter().getPlace().getImgRoot() + getPresenter().getMonument().getImgs().get(0).getImg() : "", getPresenter().getMonument());
+        monumentInfoWindow.setOnWindowClickListener(new MonumentInfoWindow.OnWindowClickListener() {
+            @Override
+            public void onWindowClick(MonumentInfoWindow window) {
+                onMarkerClick(monumentMarker, mapView);
+            }
+
+            @Override
+            public void onButtonClick(MonumentInfoWindow window) {
+
+            }
+        });
+        monumentMarker.setInfoWindow(monumentInfoWindow);
+        monumentMarker.showInfoWindow();
+        monumentInfoWindow.hideBtn();
 
         Marker userMarker = new Marker(mapView);
         userMarker.setPosition(new GeoPoint(userLat, userLng));
@@ -181,9 +222,6 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(roadOverlay -> {
                         mapView.getOverlays().add(roadOverlay);
-                        //mapView.invalidate();
-                        mapView.getController().setCenter(new GeoPoint(userLat, userLng));
-                        mapView.getController().setZoom(16);
                         mapView.invalidate();
                         distance.setText(distanceTo + " м");
                         distanceBlock.setVisibility(View.VISIBLE);
@@ -202,26 +240,6 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
             distance.setText(distanceTo + " м");
             distanceBlock.setVisibility(View.VISIBLE);
         }
-        //Toast.makeText(this, loc1.distanceTo(loc2) + " meters", Toast.LENGTH_SHORT).show();
-        //mapView.getController().setZoom(12);
-        //mapView.getController().setCenter(new GeoPoint(userLat, userLng));
-
-       /* Observable.just(1)
-                .subscribeOn(Schedulers.io())
-                .map(res -> {
-                    RoadManager roadManager = new OSRMRoadManager(getApplicationContext());
-                    ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-                    waypoints.add(new GeoPoint(userLat, userLng));
-                    waypoints.add(endPoint);
-                    Road road = roadManager.getRoad(waypoints);
-                    Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-                    return roadOverlay;
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(roadOverlay -> {
-                    mapView.getOverlays().add(roadOverlay);
-                    mapView.invalidate();
-                });*/
     }
 
 }
