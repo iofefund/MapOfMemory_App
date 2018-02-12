@@ -61,7 +61,7 @@ public class NamesPresenter extends AppMvpPresenter<NamesView> {
                                         .toList()
                                         .blockingGet();
                                 for (MonumentEntity monumentEntity: monumentEntities){
-                                    if (monumentEntity.getRealName().contains(", ")){
+                                    if (monumentEntity.getRealName().contains(", ") && !monumentEntity.getRealName().contains("Безымянный")){
                                         String[] names = monumentEntity.getRealName().split(", ");
                                         for (String name : names){
                                             PersonInfo personInfo = new PersonInfo();
@@ -75,8 +75,8 @@ public class NamesPresenter extends AppMvpPresenter<NamesView> {
                                     else{
                                         PersonInfo personInfo = new PersonInfo();
                                         if (monumentEntity.getImgs().size() > 0) personInfo.setImage(place.getImgRoot() + monumentEntity.getImgs().get(0).getImg());
-                                        if (monumentEntity.getRealName().contains(", ")){
-                                            personInfo.setName(monumentEntity.getRealName().replaceAll(", ", "\n"));
+                                        if (monumentEntity.getRealName().contains("Безымянный")){
+                                            personInfo.setName(monumentEntity.getName());
                                         }
                                         else{
                                             personInfo.setName(monumentEntity.getRealName());

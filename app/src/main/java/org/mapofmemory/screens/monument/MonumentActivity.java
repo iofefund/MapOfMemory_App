@@ -80,33 +80,34 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setMaxZoomLevel(19);
         mapView.setMultiTouchControls(false);
-        final GeoPoint startPoint = new GeoPoint(Float.parseFloat(monumentEntity.getLat()), Float.parseFloat(monumentEntity.getLng()));
-        Marker startMarker = new Marker(mapView);
-        startMarker.setPosition(startPoint);
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
-        startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
-        mapView.getOverlays().add(startMarker);
-        mapView.getController().setZoom(15);
-        mapView.getController().setCenter(startPoint);
-        mapView.invalidate();
-        mapView.setVisibility(View.VISIBLE);
-        mapView.setOnTouchListener((View arg0, MotionEvent arg1) -> {
-                    if(arg1.getAction() ==  MotionEvent.ACTION_UP)
-                    {
-                        mapView.getController().setCenter(startPoint);
-                        return true;
+        try {
+            final GeoPoint startPoint = new GeoPoint(Float.parseFloat(monumentEntity.getLat()), Float.parseFloat(monumentEntity.getLng()));
+            Marker startMarker = new Marker(mapView);
+            startMarker.setPosition(startPoint);
+            startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
+            startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
+            mapView.getOverlays().add(startMarker);
+            mapView.getController().setZoom(15);
+            mapView.getController().setCenter(startPoint);
+            mapView.invalidate();
+            mapView.setVisibility(View.VISIBLE);
+            mapView.setOnTouchListener((View arg0, MotionEvent arg1) -> {
+                        if (arg1.getAction() == MotionEvent.ACTION_UP) {
+                            mapView.getController().setCenter(startPoint);
+                            return true;
+                        }
+                        if (arg1.getPointerCount() > 1) {
+                            mapView.getController().setCenter(startPoint);
+                            return false;
+                        } else {
+                            return true;
+                        }
                     }
-                    if(arg1.getPointerCount() > 1)
-                    {
-                        mapView.getController().setCenter(startPoint);
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
-                }
-        );
+            );
+        }
+        catch (Exception e){
+
+        }
     }
 
     @Override

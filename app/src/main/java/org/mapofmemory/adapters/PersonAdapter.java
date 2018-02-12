@@ -18,6 +18,7 @@ import org.mapofmemory.R;
 import org.mapofmemory.entities.PersonInfo;
 import org.mapofmemory.entities.RouteInfo;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ import io.reactivex.Observable;
  */
 
 public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonHolder> implements FastScrollRecyclerView.SectionedAdapter{
-    private List<PersonInfo> personInfos;
+    final private List<PersonInfo> personInfos;
 
     public class PersonHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.profile_image) CircleImageView image;
@@ -75,16 +76,20 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonHold
         holder.name.setMaxLines(1);
         PersonInfo personInfo = personInfos.get(position);
         Picasso.with(holder.getContext()).load(personInfo.getImage()).into(holder.image);
-        if (personInfo.getName().contains("\n")){
-            holder.name.setMaxLines(2);
-        }
         if (personInfo.getInners().size() >= 1){
+            List<PersonInfo> infos = new ArrayList<>();
+            infos.addAll(personInfo.getInners());
             holder.v.setOnClickListener(v -> {
-                PersonAdapter personAdapter = new PersonAdapter(Observable.fromIterable(personInfo.getInners())
+                PersonAdapter personAdapter = new PersonAdapter(Observable.fromIterable(infos)
                         .map(person -> {
-                            person.setName(person.getType());
-                            person.setInners(new ArrayList<>());
-                            return person;
+                            PersonInfo p = new PersonInfo();
+                            Log.d("NAME", person.getType());
+                            p.setName(person.getType());
+                            p.setInners(new ArrayList<>());
+                            p.setImage(person.getImage());
+                            p.setNum(person.getNum());
+                            p.setType(p.getType());
+                            return p;
                         })
                         .toList()
                         .blockingGet());

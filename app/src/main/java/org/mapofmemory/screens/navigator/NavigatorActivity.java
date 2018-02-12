@@ -169,7 +169,9 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
     }
 
     private void updateMap(double userLat, double userLng){
-                Location loc1 = new Location("");
+        mapView.getOverlayManager().clear();
+        mapView.getOverlays().clear();
+        Location loc1 = new Location("");
         final GeoPoint endPoint = new GeoPoint(Float.parseFloat(getPresenter().getMonument().getLat()), Float.parseFloat(getPresenter().getMonument().getLng()));
         Marker monumentMarker = new Marker(mapView);
         monumentMarker.setPosition(endPoint);

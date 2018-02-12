@@ -7,7 +7,7 @@ import java.util.List;
  * Created by The Tronuo on 05.02.2018.
  */
 
-public class PersonInfo {
+public class PersonInfo{
     private String image, name;
     private int num;
     private String type;
