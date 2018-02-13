@@ -13,6 +13,8 @@ import com.pushtorefresh.storio3.sqlite.queries.RawQuery;
 import org.mapofmemory.AppMvpPresenter;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.entities.MonumentEntityTable;
+import org.mapofmemory.entities.PersonEntity;
+import org.mapofmemory.entities.PersonEntityTable;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.entities.PlaceEntityTable;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -69,7 +71,10 @@ public class MenuPresenter extends AppMvpPresenter<MenuView>{
         mDataManager.getMonuments()
                 .observeOn(mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(monuments -> cacheMonuments(monuments));
+                .subscribe(monuments -> {
+                    cacheMonuments(monuments.getMonuments());
+                    cachePersons(monuments.getPersons());
+                });
     }
 
     private List<PlaceEntity> placesFromCache(){
@@ -97,6 +102,22 @@ public class MenuPresenter extends AppMvpPresenter<MenuView>{
                 .executeAsBlocking();
     }
 
+    private void cachePersons(List<PersonEntity> persons){
+        mDataManager.storIOSQLite
+                .delete()
+                .byQuery(DeleteQuery.builder()
+                        .table(PersonEntityTable.NAME).build()
+                )
+                .prepare()
+                .executeAsBlocking();
+
+        mDataManager.storIOSQLite
+                .put()
+                .objects(persons)
+                .prepare()
+                .executeAsBlocking();
+    }
+
     private void cacheMonuments(List<MonumentEntity> monuments){
         mDataManager.storIOSQLite
                 .delete()
@@ -111,6 +132,7 @@ public class MenuPresenter extends AppMvpPresenter<MenuView>{
                         .map(monumentEntity -> {
                             Gson gson = new GsonBuilder().setPrettyPrinting().create();
                             monumentEntity.setImgs_json(gson.toJson(monumentEntity.getImgs()));
+                            monumentEntity.setBiographyIdsJson(gson.toJson(monumentEntity.getBiographyIds()));
                             return monumentEntity;
                         })
                         .toList()

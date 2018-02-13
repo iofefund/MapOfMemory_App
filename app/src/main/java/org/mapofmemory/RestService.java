@@ -3,6 +3,7 @@ package org.mapofmemory;
 import org.mapofmemory.entities.AboutEntity;
 import org.mapofmemory.entities.DayOfMemory;
 import org.mapofmemory.entities.MonumentEntity;
+import org.mapofmemory.entities.MonumentResponse;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.entities.RouteEntity;
 
@@ -22,7 +23,7 @@ public interface RestService{
     Single<List<PlaceEntity>> getPlaces();
 
     @GET("monuments.php")
-    Single<List<MonumentEntity>> getMonuments();
+    Single<MonumentResponse> getMonuments();
 
     @GET("about.php")
     Single<AboutEntity> getAboutInfo(@Query("place_id") int placeId);

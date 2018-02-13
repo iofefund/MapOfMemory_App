@@ -7,8 +7,12 @@ import com.pushtorefresh.storio3.sqlite.queries.Query;
 
 import org.mapofmemory.AppConfig;
 import org.mapofmemory.AppMvpPresenter;
+import org.mapofmemory.adapters.MonumentAdapter;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.entities.MonumentEntityTable;
+import org.mapofmemory.entities.MonumentImgEntity;
+import org.mapofmemory.entities.PersonEntity;
+import org.mapofmemory.entities.PersonEntityTable;
 import org.mapofmemory.entities.PersonInfo;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.entities.PlaceEntityTable;
@@ -29,7 +33,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class NamesPresenter extends AppMvpPresenter<NamesView> {
     private int placeId;
-    private PlaceEntity place;
+    PlaceEntity place;
+    private List<MonumentEntity> monuments;
     public NamesPresenter(Context context, int placeId){
         super(context);
         this.placeId = placeId;
@@ -45,79 +50,30 @@ public class NamesPresenter extends AppMvpPresenter<NamesView> {
                             .withQuery(Query.builder().table(PlaceEntityTable.NAME).where("id = ?").whereArgs(placeId).build())
                             .prepare()
                             .executeAsBlocking();
-                    List<MonumentEntity> monuments = mDataManager.storIOSQLite
+                    monuments = mDataManager.storIOSQLite
                             .get()
                             .listOfObjects(MonumentEntity.class)
-                            .withQuery(Query.builder().table(MonumentEntityTable.NAME).where("place_id = ? AND type = ?").whereArgs(placeId, "1").build())
+                            .withQuery(Query.builder().table(MonumentEntityTable.NAME).where("place_id = ?").whereArgs(placeId).build())
                             .prepare()
                             .executeAsBlocking();
-                    List<PersonInfo> personInfos = Observable.fromIterable(monuments)
-                            .filter(monumentEntity -> !monumentEntity.getRealName().isEmpty())
-                            .toList()
-                            .map(monumentEntities -> {
-                                List<PersonInfo> infos = new ArrayList<>();
-                                List<String> persons = Observable.fromIterable(monumentEntities)
-                                        .map(monumentEntity -> monumentEntity.getRealName())
-                                        .toList()
-                                        .blockingGet();
-                                for (MonumentEntity monumentEntity: monumentEntities){
-                                    if (monumentEntity.getRealName().contains(", ") && !monumentEntity.getRealName().contains("Безымянный")){
-                                        String[] names = monumentEntity.getRealName().split(", ");
-                                        for (String name : names){
-                                            PersonInfo personInfo = new PersonInfo();
-                                            if (monumentEntity.getImgs().size() > 0) personInfo.setImage(place.getImgRoot() + monumentEntity.getImgs().get(0).getImg());
-                                            personInfo.setName(name.trim());
-                                            personInfo.setType(monumentEntity.getType2());
-                                            personInfo.setNum(monumentEntity.getNum());
-                                            infos.add(personInfo);
-                                        }
-                                    }
-                                    else{
-                                        PersonInfo personInfo = new PersonInfo();
-                                        if (monumentEntity.getImgs().size() > 0) personInfo.setImage(place.getImgRoot() + monumentEntity.getImgs().get(0).getImg());
-                                        if (monumentEntity.getRealName().contains("Безымянный")){
-                                            personInfo.setName(monumentEntity.getName());
-                                        }
-                                        else{
-                                            personInfo.setName(monumentEntity.getRealName());
-                                        }
-                                        personInfo.setType(monumentEntity.getType2());
-                                        personInfo.setNum(monumentEntity.getNum());
-                                        infos.add(personInfo);
-                                    }
-                                }
-                                return infos;
-                            })
-                            .blockingGet();
-                    Collections.sort(personInfos, new Comparator<PersonInfo>() {
-                        @Override
-                        public int compare(PersonInfo o1, PersonInfo o2) {
-                            return o1.getName().compareTo(o2.getName());
-                        }
-                    });
-                    Log.d("PERSONS", AppConfig.getDuplicates(personInfos).toString());
-                    List<String> duplicates = AppConfig.getDuplicates(personInfos);
-                    for (String duplicate : duplicates){
-                        List<PersonInfo> persons = new ArrayList<>();
-                        persons.addAll(personInfos);
-                        List<PersonInfo> innerPersons = Observable.fromIterable(persons)
-                                .filter(personInfo1 -> personInfo1.getName().equals(duplicate))
-                                .map(personInfo1 -> {
-                                    //personInfo1.setName(personInfo1.getType());
-                                    return personInfo1;
-                                })
-                                .toList()
-                                .blockingGet();
-                        try {
-                            personInfos.get(AppConfig.findPersonInfoByName(personInfos, duplicate)).setInners(innerPersons);
-                        }
-                        catch (Exception e){
-
-                        }
-                    }
-                    return AppConfig.removePersonDuplicates(personInfos);
+                    List<PersonEntity> persons = mDataManager.storIOSQLite
+                            .get()
+                            .listOfObjects(PersonEntity.class)
+                            .withQuery(Query.builder().table(PersonEntityTable.NAME).where("place_id = ?").whereArgs(place.getId()).build())
+                            .prepare()
+                            .executeAsBlocking();
+                    List<PersonEntity> p = new ArrayList<PersonEntity>(persons);
+                    Collections.sort(p, (o1, o2) -> o1.getName().compareTo(o2.getName()));
+                    return Observable.fromIterable(p).map(personEntity -> {
+                        personEntity.setImg(place.getImgRoot().replace("monument", "biography") + personEntity.getImg());
+                        return personEntity;
+                    }).toList().blockingGet();
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(personInfos -> getView().onPersonLoad(personInfos));
+    }
+
+    public List<MonumentEntity> getMonuments() {
+        return monuments;
     }
 }

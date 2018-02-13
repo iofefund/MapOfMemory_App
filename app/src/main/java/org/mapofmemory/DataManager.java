@@ -19,6 +19,11 @@ import org.mapofmemory.entities.MonumentEntityStorIOSQLiteDeleteResolver;
 import org.mapofmemory.entities.MonumentEntityStorIOSQLiteGetResolver;
 import org.mapofmemory.entities.MonumentEntityStorIOSQLitePutResolver;
 import org.mapofmemory.entities.MonumentImgEntity;
+import org.mapofmemory.entities.MonumentResponse;
+import org.mapofmemory.entities.PersonEntity;
+import org.mapofmemory.entities.PersonEntityStorIOSQLiteDeleteResolver;
+import org.mapofmemory.entities.PersonEntityStorIOSQLiteGetResolver;
+import org.mapofmemory.entities.PersonEntityStorIOSQLitePutResolver;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.entities.PlaceEntityStorIOSQLiteDeleteResolver;
 import org.mapofmemory.entities.PlaceEntityStorIOSQLiteGetResolver;
@@ -85,6 +90,11 @@ public class DataManager {
                         .getResolver(new RouteEntityStorIOSQLiteGetResolver())
                         .deleteResolver(new RouteEntityStorIOSQLiteDeleteResolver())
                         .build())
+                .addTypeMapping(PersonEntity.class, SQLiteTypeMapping.<PersonEntity>builder()
+                        .putResolver(new PersonEntityStorIOSQLitePutResolver())
+                        .getResolver(new PersonEntityStorIOSQLiteGetResolver())
+                        .deleteResolver(new PersonEntityStorIOSQLiteDeleteResolver())
+                        .build())
                 .build();
         sharedPrefs = new SharedPrefs(context);
     }
@@ -93,7 +103,7 @@ public class DataManager {
         return restService.getPlaces();
     }
 
-    public Single<List<MonumentEntity>> getMonuments(){
+    public Single<MonumentResponse> getMonuments(){
         return restService.getMonuments();
     }
 

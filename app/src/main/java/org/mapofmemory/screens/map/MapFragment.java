@@ -8,18 +8,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
@@ -33,7 +26,6 @@ import com.orhanobut.dialogplus.ViewHolder;
 import org.mapofmemory.AppConfig;
 import org.mapofmemory.MonumentInfoWindow;
 import org.mapofmemory.R;
-import org.mapofmemory.adapters.MonumentEntityAdapter;
 import org.mapofmemory.adapters.SearchAdapter;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.main.MainActivity;
@@ -41,16 +33,11 @@ import org.mapofmemory.screens.monument.MonumentActivity;
 import org.mapofmemory.screens.navigator.NavigatorActivity;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.overlay.DefaultOverlayManager;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.TilesOverlay;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import butterknife.BindDrawable;
 import butterknife.BindView;
@@ -228,12 +215,12 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
 
     public void initSearchView(){
         List<String> suggestions = Observable.fromIterable(monuments)
-                .filter(monumentEntity -> !monumentEntity.getRealName().isEmpty() || !monumentEntity.getName().isEmpty())
-                .map(monumentEntity -> monumentEntity.getType().equals("1") ? monumentEntity.getRealName() : monumentEntity.getName())
+                .filter(monumentEntity -> !monumentEntity.getKeywords().isEmpty() || !monumentEntity.getName().isEmpty())
+                .map(monumentEntity -> monumentEntity.getType().equals("1") ? monumentEntity.getKeywords() : monumentEntity.getName())
                 .toList()
                 .blockingGet();
         suggestions = AppConfig.removeTheDuplicates(suggestions);
-        ((MainActivity)activity).searchView.setAdapter(new SearchAdapter(activity, suggestions.toArray(new String[suggestions.size()])));
+        ((MainActivity)activity).searchView.setAdapter(new SearchAdapter(activity, suggestions.toArray(new String[suggestions.size()]), monuments));
         ((MainActivity)activity).searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
@@ -249,7 +236,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
             TextView suggestion = (TextView) view.findViewById(R.id.suggestion_text);
             List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
                     .filter(monumentEntity -> {
-                        return monumentEntity.getType().equals("1") ? monumentEntity.getRealName().equals(suggestion.getText().toString()) : monumentEntity.getName().equals(suggestion.getText().toString());
+                        return monumentEntity.getType().equals("1") ? monumentEntity.getKeywords().equals(suggestion.getText().toString()) : monumentEntity.getName().equals(suggestion.getText().toString());
                     })
                     .toList()
                     .blockingGet();

@@ -15,6 +15,7 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import org.mapofmemory.R;
 import org.mapofmemory.adapters.PersonAdapter;
+import org.mapofmemory.entities.PersonEntity;
 import org.mapofmemory.entities.PersonInfo;
 import org.mapofmemory.screens.monument.MonumentActivity;
 
@@ -49,15 +50,16 @@ public class NamesFragment extends MvpFragment<NamesView, NamesPresenter> implem
     }
 
     @Override
-    public void onPersonLoad(List<PersonInfo> persons) {
+    public void onPersonLoad(List<PersonEntity> persons) {
         progressBar.setVisibility(View.GONE);
-        PersonAdapter personAdapter = new PersonAdapter(persons);
+        PersonAdapter personAdapter = new PersonAdapter(persons, getPresenter().getMonuments());
         personAdapter.setOnPersonClickListener(personInfo -> {
             Intent newInt = new Intent(getActivity(), MonumentActivity.class);
             newInt.putExtra("monument_id", personInfo.getNum() + "");
-            newInt.putExtra("image_url", personInfo.getImage());
+            newInt.putExtra("image_url", personInfo.getImgs().get(0).getImg());
             startActivity(newInt);
         });
+        personAdapter.setImgRoot(getPresenter().place.getImgRoot());
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(personAdapter);
     }

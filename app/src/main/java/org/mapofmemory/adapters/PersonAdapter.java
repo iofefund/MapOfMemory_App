@@ -9,13 +9,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import com.squareup.picasso.Picasso;
 
 import org.mapofmemory.R;
-import org.mapofmemory.entities.PersonInfo;
+import org.mapofmemory.entities.MonumentEntity;
+import org.mapofmemory.entities.MonumentImgEntity;
+import org.mapofmemory.entities.PersonEntity;
 import org.mapofmemory.entities.RouteInfo;
 
 import java.lang.reflect.Array;
@@ -32,8 +35,8 @@ import io.reactivex.Observable;
  */
 
 public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonHolder> implements FastScrollRecyclerView.SectionedAdapter{
-    final private List<PersonInfo> personInfos;
-
+    final private List<PersonEntity> persons;
+    private String imgRoot;
     public class PersonHolder extends RecyclerView.ViewHolder{
         @BindView(R.id.profile_image) CircleImageView image;
         @BindView(R.id.name) TextView name;
@@ -51,9 +54,14 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonHold
         }
     }
 
+    public void setImgRoot(String imgRoot) {
+        this.imgRoot = imgRoot;
+    }
 
-    public PersonAdapter(List<PersonInfo> personInfos) {
-        this.personInfos = personInfos;
+    private List<MonumentEntity> monuments;
+    public PersonAdapter(List<PersonEntity> persons, List<MonumentEntity> monuments) {
+        this.persons = persons;
+        this.monuments = monuments;
     }
 
     @Override
@@ -68,58 +76,51 @@ public class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonHold
     @NonNull
     @Override
     public String getSectionName(int position) {
-        return personInfos.get(position).getName().substring(0, 1);
+        return persons.get(position).getName().substring(0, 1);
     }
 
     @Override
     public void onBindViewHolder(PersonHolder holder, int position) {
         holder.name.setMaxLines(1);
-        PersonInfo personInfo = personInfos.get(position);
-        Picasso.with(holder.getContext()).load(personInfo.getImage()).into(holder.image);
-        if (personInfo.getInners().size() >= 1){
-            List<PersonInfo> infos = new ArrayList<>();
-            infos.addAll(personInfo.getInners());
-            holder.v.setOnClickListener(v -> {
-                PersonAdapter personAdapter = new PersonAdapter(Observable.fromIterable(infos)
-                        .map(person -> {
-                            PersonInfo p = new PersonInfo();
-                            Log.d("NAME", person.getType());
-                            p.setName(person.getType());
-                            p.setInners(new ArrayList<>());
-                            p.setImage(person.getImage());
-                            p.setNum(person.getNum());
-                            p.setType(p.getType());
-                            return p;
-                        })
-                        .toList()
-                        .blockingGet());
-                MaterialDialog mDialog = new MaterialDialog.Builder(holder.getContext())
-                        .adapter(personAdapter, null)
-                        .show();
-                personAdapter.setOnPersonClickListener(x ->{
-                    //mDialog.dismiss();
-                    PersonInfo p = new PersonInfo();
-                    p.setName(x.getName());
-                    p.setNum(x.getNum());
-                    p.setImage(x.getImage());
-                    onPersonClickListener.onClick(p);
+        PersonEntity person = persons.get(position);
+        Log.d("IMG", person.getImg());
+        Picasso.with(holder.getContext()).load(person.getImg()).error(R.drawable.no_photo).into(holder.image);
+        holder.itemView.setOnClickListener(v -> {
+            List<MonumentEntity> monumentEntities = Observable.fromIterable(monuments)
+                    .filter(monumentEntity -> monumentEntity.getBiographyIdsJson().contains(person.getId()))
+                    .toList().blockingGet();
+            if (monumentEntities.size() > 1){
+                for (MonumentEntity monumentEntity : monumentEntities) {
+                    for (MonumentImgEntity img : monumentEntity.getImgs()) {
+                        if (!img.getImg().contains("http")) img.setImg(imgRoot + img.getImg());
+                    }
+                }
+                MonumentAdapter adapter = new MonumentAdapter(monumentEntities);
+                adapter.setOnPersonClickListener(x -> {
+                    onPersonClickListener.onClick(x);
                 });
-            });
-        }
-        else{
-            holder.v.setOnClickListener(v -> onPersonClickListener.onClick(personInfo));
-        }
-        holder.name.setText(personInfo.getName());
+                new MaterialDialog.Builder(holder.getContext())
+                        .adapter(adapter, null)
+                        .show();
+            }
+            else if (monumentEntities.size() == 1){
+                for (MonumentImgEntity img: monumentEntities.get(0).getImgs()){
+                    if (!img.getImg().contains("http")) img.setImg(imgRoot + img.getImg());
+                }
+                onPersonClickListener.onClick(monumentEntities.get(0));
+            }
+        });
+        holder.name.setText(person.getName());
     }
 
     @Override
     public int getItemCount() {
-        return personInfos.size();
+        return persons.size();
     }
 
     private OnPersonClickListener onPersonClickListener;
     public interface OnPersonClickListener{
-        void onClick(PersonInfo personInfo);
+        void onClick(MonumentEntity monumentEntity);
     }
 
     public void setOnPersonClickListener(OnPersonClickListener onPersonClickListener) {

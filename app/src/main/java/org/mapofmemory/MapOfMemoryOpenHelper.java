@@ -9,6 +9,8 @@ import org.mapofmemory.entities.AboutEntityTable;
 import org.mapofmemory.entities.DayOfMemory;
 import org.mapofmemory.entities.DayOfMemoryTable;
 import org.mapofmemory.entities.MonumentEntityTable;
+import org.mapofmemory.entities.PersonEntity;
+import org.mapofmemory.entities.PersonEntityTable;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.entities.PlaceEntityTable;
 import org.mapofmemory.entities.RouteEntity;
@@ -20,7 +22,7 @@ import org.mapofmemory.entities.RouteEntityTable;
 
 public class MapOfMemoryOpenHelper extends SQLiteOpenHelper {
     final private static String DATABASE_NAME = "Data";
-    final private static int DATABASE_VERSION = 21;
+    final private static int DATABASE_VERSION = 23;
 
     public MapOfMemoryOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,6 +33,7 @@ public class MapOfMemoryOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         MonumentEntityTable.createTable(db);
         PlaceEntityTable.createTable(db);
+        PersonEntityTable.createTable(db);
         DayOfMemoryTable.createTable(db);
         AboutEntityTable.createTable(db);
         RouteEntityTable.createTable(db);
@@ -45,10 +48,10 @@ public class MapOfMemoryOpenHelper extends SQLiteOpenHelper {
         if (oldVersion != newVersion) {
             db.execSQL("DROP TABLE IF EXISTS " + MonumentEntityTable.NAME);
             db.execSQL("DROP TABLE IF EXISTS " + PlaceEntityTable.NAME);
+            db.execSQL("DROP TABLE IF EXISTS " + PersonEntityTable.NAME);
             db.execSQL("DROP TABLE IF EXISTS " + DayOfMemoryTable.NAME);
             db.execSQL("DROP TABLE IF EXISTS " + AboutEntityTable.NAME);
             db.execSQL("DROP TABLE IF EXISTS " + RouteEntityTable.NAME);
-
             onCreate(db);
         }
         MonumentEntityTable.updateTable(db, oldVersion);

@@ -16,6 +16,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import org.mapofmemory.R;
+import org.mapofmemory.entities.MonumentEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +32,12 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
     private Drawable suggestionIcon;
     private LayoutInflater inflater;
     private boolean ellipsize;
-
-    public SearchAdapter(Context context, String[] suggestions) {
+    private List<MonumentEntity> monuments;
+    public SearchAdapter(Context context, String[] suggestions, List<MonumentEntity> monuments) {
         inflater = LayoutInflater.from(context);
         data = new ArrayList<>();
         this.suggestions = suggestions;
+        this.monuments = monuments;
     }
 
     public SearchAdapter(Context context, String[] suggestions, Drawable suggestionIcon, boolean ellipsize) {
@@ -56,7 +58,18 @@ public class SearchAdapter extends BaseAdapter implements Filterable {
 
                     // Retrieve the autocomplete results.
                     List<String> searchData = new ArrayList<>();
-
+                    /*for (MonumentEntity monumentEntity : monuments){
+                        if (monumentEntity.getType().equals("1")){
+                            if (monumentEntity.getKeywords().toLowerCase().contains(constraint.toString().toLowerCase())){
+                                searchData.add(monumentEntity.getKeywords());
+                            }
+                        }
+                        if (monumentEntity.getType().equals("2")){
+                            if (monumentEntity.getName().toLowerCase().contains(constraint.toString().toLowerCase())){
+                                searchData.add(monumentEntity.getName());
+                            }
+                        }
+                    }*/
                     for (String string : suggestions) {
                         if (string.toLowerCase().contains(constraint.toString().toLowerCase())) {
                             searchData.add(string);
