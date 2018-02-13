@@ -1,5 +1,8 @@
 package org.mapofmemory.screens.monument;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.squareup.picasso.Picasso;
 
+import org.mapofmemory.AppConfig;
 import org.mapofmemory.R;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.navigator.NavigatorActivity;
@@ -44,6 +48,8 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
     @BindView(R.id.type) TextView type;
     @BindView(R.id.toolbar_layout) CollapsingToolbarLayout toolbarLayout;
     @BindView(R.id.map_view) MapView mapView;
+    @BindView(R.id.gps) TextView gps;
+
     @BindDrawable(R.drawable.ic_blue_marker) Drawable blueMarker;
     @BindDrawable(R.drawable.ic_red_marker) Drawable redMarker;
 
@@ -51,6 +57,13 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
         Intent newInt = new Intent(this, NavigatorActivity.class);
         newInt.putExtra("monument_id", getIntent().getStringExtra("monument_id"));
         startActivity(newInt);
+    }
+
+    @OnClick(R.id.gps_block) void onCopyGPS(){
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("GPS", gps.getText().toString());
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show();
     }
 
     @NonNull
@@ -75,8 +88,9 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
             } else {
                 type.setVisibility(View.GONE);
             }
-            toolbarLayout.setTitle("Назад к именам");
+            getSupportActionBar().setTitle("Назад к именам");
         }
+        gps.setText(AppConfig.getFormattedLocationInDegree(Double.parseDouble(monumentEntity.getLat()), Double.parseDouble(monumentEntity.getLng())));
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setMaxZoomLevel(19);
         mapView.setMultiTouchControls(false);
@@ -125,7 +139,7 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
             } else {
                 type.setVisibility(View.GONE);
             }
-            toolbarLayout.setTitle("Назад к карте");
+            getSupportActionBar().setTitle("Назад к карте");
             name.setText(getIntent().getStringExtra("name"));
         }
         getPresenter().loadMonument();

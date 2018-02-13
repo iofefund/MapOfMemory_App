@@ -90,7 +90,7 @@ public class RouteFragment extends MvpFragment<RouteView, RoutePresenter> implem
     public void onPlaceLoaded(PlaceEntity place, RouteEntity route) {
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setMaxZoomLevel(20);
-        mapView.setUseDataConnection(false);
+        //mapView.setUseDataConnection(false);
         mapView.setMultiTouchControls(false);
         GeoPoint startPoint = null;
         if (route.getStartLat().equals("0") && route.getStartLng().equals("0")){

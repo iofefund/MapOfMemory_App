@@ -13,6 +13,7 @@
         app:stl_indicatorColor="#40C4FF"
         app:stl_indicatorThickness="3dp"
         app:stl_indicatorWidth="auto"
+        app:stl_defaultTabTextSize="11sp"
         app:stl_dividerColor="#4D000000"
         app:stl_dividerThickness="1dp"
         app:stl_distributeEvenly="true"

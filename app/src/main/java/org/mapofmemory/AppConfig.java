@@ -24,43 +24,43 @@ import io.reactivex.Observable;
 
 public class AppConfig {
     final public static String BASE_URL = "https://mapofmemory.org/api/v1/";
-    public static float convertDpToPixel(float dp, Context context){
+
+    public static float convertDpToPixel(float dp, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        float px = dp * ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return px;
     }
 
     /**
      * This method converts device specific pixels to density independent pixels.
      *
-     * @param px A value in px (pixels) unit. Which we need to convert into db
+     * @param px      A value in px (pixels) unit. Which we need to convert into db
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent dp equivalent to px value
      */
-    public static float convertPixelsToDp(float px, Context context){
+    public static float convertPixelsToDp(float px, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        float dp = px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return dp;
     }
 
-    public static String convertDate(String currentDate){
+    public static String convertDate(String currentDate) {
         DateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat targetFormat = new SimpleDateFormat("d MMMM yyyy");
         try {
             Date date = originalFormat.parse(currentDate);
             return targetFormat.format(date);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return "";
         }
     }
 
     public static List<String> removeTheDuplicates(List<String> myList) {
-        for(ListIterator<String> iterator = myList.listIterator(); iterator.hasNext();) {
+        for (ListIterator<String> iterator = myList.listIterator(); iterator.hasNext(); ) {
             String str = iterator.next();
-            if(Collections.frequency(myList, str) > 1) {
+            if (Collections.frequency(myList, str) > 1) {
                 iterator.remove();
             }
         }
@@ -70,8 +70,8 @@ public class AppConfig {
     public static List<PersonInfo> removePersonDuplicates(List<PersonInfo> personInfos) {
         List<String> res = new ArrayList<>();
         List<PersonInfo> persons = new ArrayList<>();
-        for (PersonInfo person : personInfos){
-            if (!res.contains(person.getName())){
+        for (PersonInfo person : personInfos) {
+            if (!res.contains(person.getName())) {
                 res.add(person.getName());
                 persons.add(person);
             }
@@ -85,9 +85,9 @@ public class AppConfig {
                 .map(personInfo -> personInfo.getName())
                 .toList()
                 .blockingGet();
-        for(ListIterator<String> iterator = persons.listIterator(); iterator.hasNext();) {
+        for (ListIterator<String> iterator = persons.listIterator(); iterator.hasNext(); ) {
             String str = iterator.next();
-            if(Collections.frequency(persons, str) >= 2) {
+            if (Collections.frequency(persons, str) >= 2) {
                 res.add(str);
             }
         }
@@ -96,10 +96,34 @@ public class AppConfig {
 
     public static int findPersonInfoByName(List<PersonInfo> personInfos, String name) {
         int index = -1;
-        for (int i = 0; i <= personInfos.size() - 1; i++){
+        for (int i = 0; i <= personInfos.size() - 1; i++) {
             if (personInfos.get(i).getName().equals(name)) return i;
         }
         return index;
+    }
 
+    public static String getFormattedLocationInDegree(double latitude, double longitude) {
+        try {
+            int latSeconds = (int) Math.round(latitude * 3600);
+            int latDegrees = latSeconds / 3600;
+            latSeconds = Math.abs(latSeconds % 3600);
+            int latMinutes = latSeconds / 60;
+            latSeconds %= 60;
+
+            int longSeconds = (int) Math.round(longitude * 3600);
+            int longDegrees = longSeconds / 3600;
+            longSeconds = Math.abs(longSeconds % 3600);
+            int longMinutes = longSeconds / 60;
+            longSeconds %= 60;
+            String latDegree = latDegrees >= 0 ? "N" : "S";
+            String lonDegrees = longDegrees >= 0 ? "E" : "W";
+
+            return Math.abs(latDegrees) + "°" + latMinutes + "'" + latSeconds
+                    + "\"" + latDegree + " " + Math.abs(longDegrees) + "°" + longMinutes
+                    + "'" + longSeconds + "\"" + lonDegrees;
+        } catch (Exception e) {
+            return "" + String.format("%8.5f", latitude) + "  "
+                    + String.format("%8.5f", longitude);
+        }
     }
 }
