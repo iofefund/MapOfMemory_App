@@ -89,7 +89,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         progressBar.setVisibility(View.VISIBLE);
         this.activity = getActivity();
         map.setTileSource(TileSourceFactory.MAPNIK);
-        map.getController().setZoom(16);
+        map.getController().setZoom(18);
         map.setMaxZoomLevel(19);
         map.setMultiTouchControls(true);
         GeoPoint startPoint = new GeoPoint(getArguments().getDouble("lat"), getArguments().getDouble("lng"));
