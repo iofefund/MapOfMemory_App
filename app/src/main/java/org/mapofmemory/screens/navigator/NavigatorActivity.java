@@ -152,6 +152,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
     @Override
     public void onLocationUpdated(Location location) {
         updateMap(location.getLatitude(), location.getLongitude());
+        //updateMap(62.8878098, 34.6796229);
     }
 
     @Override
