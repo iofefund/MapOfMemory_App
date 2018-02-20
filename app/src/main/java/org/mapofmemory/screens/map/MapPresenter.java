@@ -17,6 +17,7 @@ import java.util.Map;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -37,9 +38,9 @@ public class MapPresenter extends AppMvpPresenter<MapView> {
     public List<MonumentEntity> getMonuments() {
         return monuments;
     }
-
+    private Disposable disp;
     public void loadMonuments(){
-        mDataManager.storIOSQLite
+        disp = mDataManager.storIOSQLite
                 .get()
                 .listOfObjects(MonumentEntity.class)
                 .withQuery(Query.builder().table(MonumentEntityTable.NAME).where("lat <> '' AND lng <> '' AND place_id = ?").whereArgs(placeId).build())
@@ -61,9 +62,14 @@ public class MapPresenter extends AppMvpPresenter<MapView> {
 
     }
 
+    public void dispose(){
+        if (disp != null){
+            disp.dispose();
+        }
+    }
+
     @Override
     public void attachView(MapView view) {
         super.attachView(view);
-
     }
 }

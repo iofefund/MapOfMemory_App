@@ -1,5 +1,7 @@
 package org.mapofmemory.screens.route;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
@@ -132,6 +134,15 @@ public class RouteFragment extends MvpFragment<RouteView, RoutePresenter> implem
                     if(arg1.getAction() ==  MotionEvent.ACTION_UP)
                     {
                         mapView.getController().setCenter(gp);
+                        try {
+                            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + place.getLat() + "," + place.getLng());
+                            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                            mapIntent.setPackage("com.google.android.apps.maps");
+                            startActivity(mapIntent);
+                        }
+                        catch (Exception e){
+
+                        }
                         return true;
                     }
                     if(arg1.getPointerCount() > 1)

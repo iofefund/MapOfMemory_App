@@ -45,6 +45,7 @@ import butterknife.ButterKnife;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -139,6 +140,8 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         }
     }
 
+    private Disposable disp = null;
+
     @Override
     public void showMonuments(List<MonumentEntity> monuments, String imgRoot) {
         //smartTabLayout.setVisibility(View.GONE);
@@ -152,7 +155,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         initSearchView();
         map.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
-        Flowable.fromIterable(monuments)
+        disp = Flowable.fromIterable(monuments)
                 .subscribeOn(Schedulers.io())
                 .filter(monumentEntity ->{
                         GeoPoint startPoint = new GeoPoint(Double.parseDouble(monumentEntity.getLat()), Double.parseDouble(monumentEntity.getLng()));
@@ -242,13 +245,17 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                     .blockingGet();
             ((MainActivity)activity).searchView.dismissSuggestions();
             ((MainActivity)activity).searchView.hideKeyboard(((MainActivity)activity).searchView);
-            Observable.just(1)
+            Disposable ob = Observable.just(1)
                     .delay(100, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(res ->{
                         showMonuments(m, getPresenter().place.getImgRoot());
                         ((MainActivity)activity).searchView.dismissSuggestions();
-                        //onMarkerClick(Observable.fromIterable(markers).filter(marker -> marker.getTitle().equals("Marker" + monument.getId())).blockingFirst(), map);
+                        if (m.size() == 1){
+                            map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
+                            map.invalidate();
+                        }
+                 //       onMarkerClick(Observable.fromIterable(markers).filter(marker -> marker.getTitle().equals("Marker" + m.getId())).blockingFirst(), map);
                     });
         }));
     }
@@ -261,5 +268,12 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         MapFragment myFragment = new MapFragment();
         myFragment.setArguments(bundle);
         return myFragment;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getPresenter().dispose();
+        if (disp != null) disp.dispose();
     }
 }
