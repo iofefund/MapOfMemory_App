@@ -235,6 +235,37 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                 onTabClicked(pos);
             }
         });
+        ((MainActivity)activity).searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
+                        .filter(monumentEntity -> {
+                            return monumentEntity.getType().equals("1") ? monumentEntity.getKeywords().toLowerCase().contains(query.toLowerCase()) : monumentEntity.getName().toLowerCase().contains(query.toLowerCase());
+                        })
+                        .toList()
+                        .blockingGet();
+                ((MainActivity)activity).searchView.dismissSuggestions();
+                ((MainActivity)activity).searchView.hideKeyboard(((MainActivity)activity).searchView);
+                ((MainActivity)activity).searchView.setQuery("", false);
+                Disposable ob = Observable.just(1)
+                        .delay(100, TimeUnit.MILLISECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(res ->{
+                            showMonuments(m, getPresenter().place.getImgRoot());
+                            if (m.size() == 1){
+                                map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
+                                map.invalidate();
+                            }
+                            //      onMarkerCli
+            });
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         ((MainActivity)activity).searchView.setOnItemClickListener(((parent, view, position, id) -> {
             TextView suggestion = (TextView) view.findViewById(R.id.suggestion_text);
             List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
@@ -250,7 +281,6 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(res ->{
                         showMonuments(m, getPresenter().place.getImgRoot());
-                        ((MainActivity)activity).searchView.dismissSuggestions();
                         if (m.size() == 1){
                             map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
                             map.invalidate();
