@@ -2,28 +2,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
-    <item
-        android:id="@+id/nav_home"
-        android:icon="@drawable/ic_home"
-        android:title="Главная" />
-    <item
-        android:id="@+id/nav_about"
-        android:icon="@drawable/ic_about"
-        android:title="О" />
-    <item
-        android:id="@+id/nav_monuments"
-        android:icon="@drawable/ic_monument"
-        android:title="Карта памятников" />
-    <item
-        android:id="@+id/nav_names"
-        android:icon="@drawable/ic_person"
-        android:title="Имена" />
-    <item
-        android:id="@+id/nav_articles"
-        android:icon="@drawable/ic_article"
-        android:title="Дни памяти" />
-    <item
-        android:id="@+id/nav_route"
-        android:icon="@drawable/ic_navigation"
-        android:title="Как добраться" />
+    <group>
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_about"
+            android:title="О" />
+        <item
+            android:id="@+id/nav_monuments"
+            android:icon="@drawable/ic_monument"
+            android:title="Карта памятников" />
+        <item
+            android:id="@+id/nav_names"
+            android:icon="@drawable/ic_person"
+            android:title="Имена" />
+        <item
+            android:id="@+id/nav_articles"
+            android:icon="@drawable/ic_article"
+            android:title="Дни памяти" />
+        <item
+            android:id="@+id/nav_route"
+            android:icon="@drawable/ic_navigation"
+            android:title="Как добраться" />
+    </group>
+    <group>
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="Главная" />
+        <item
+            android:id="@+id/nav_lev"
+            android:icon="@drawable/lev"
+            android:title="Левашово" />
+    </group>
+
+
 </menu>

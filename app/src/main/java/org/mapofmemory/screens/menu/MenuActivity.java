@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
@@ -63,7 +64,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
         isDataUpdated = true;
         PlaceEntityAdapter adapter = new PlaceEntityAdapter(places);
         adapter.setOnPlaceClickListener(place -> openPlace(place.getId()));
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(adapter);
     }
 

@@ -98,5 +98,5 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_activity_navigator">NavigatorActivity</string>
-
+    <string name="official_site">Официальный сайт "Карта Памяти"</string>
 </resources>
