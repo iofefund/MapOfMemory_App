@@ -66,8 +66,26 @@
             </RelativeLayout>
         </RelativeLayout>
         <LinearLayout
-            android:layout_marginTop="7dp"
-            android:id="@+id/gps_block"
+        android:layout_marginTop="7dp"
+        android:id="@+id/gps_block"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Координаты GPS" />
+        <TextView
+            android:layout_marginTop="3dp"
+            android:id="@+id/gps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="32.4214' 51.123'" />
+    </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:id="@+id/site_block"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -75,13 +93,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
-                android:text="Координаты GPS" />
+                android:text="Переход на сайт" />
             <TextView
                 android:layout_marginTop="3dp"
-                android:id="@+id/gps"
+                android:id="@+id/site"
+                android:textColor="@android:color/holo_red_dark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="32.4214' 51.123'" />
+                android:text="@string/to_site" />
         </LinearLayout>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

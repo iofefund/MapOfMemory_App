@@ -1,6 +1,7 @@
 package org.mapofmemory.screens.navigator;
 
 import android.Manifest;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,12 +11,16 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -153,6 +158,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
     public void onLocationUpdated(Location location) {
         updateMap(location.getLatitude(), location.getLongitude());
         //updateMap(62.8878098, 34.6796229);
+        //updateMap(59.9171483,30.0448854);
     }
 
     @Override
@@ -194,14 +200,14 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         monumentMarker.setInfoWindow(monumentInfoWindow);
         monumentMarker.showInfoWindow();
         monumentInfoWindow.hideBtn();
-
         Marker userMarker = new Marker(mapView);
         userMarker.setPosition(new GeoPoint(userLat, userLng));
+        float angle = /*- (180*/ 90 - angleFromCoordinate(userLat, userLng, endPoint.getLatitude(), endPoint.getLongitude());
+        userMarker.setRotation(angle);
         userMarker.setAnchor(Marker.ANCHOR_CENTER, 0);
         userMarker.setInfoWindow(null);
-        userMarker.setIcon(getDrawable(R.drawable.user_marker));
+        userMarker.setIcon(getDrawable(R.drawable.marker));
 
-        mapView.getOverlays().add(userMarker);
         mapView.getOverlays().add(monumentMarker);
         loc1.setLatitude(userLat);
         loc1.setLongitude(userLng);
@@ -209,6 +215,9 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         Location loc2 = new Location("");
         loc2.setLatitude(Double.parseDouble(getPresenter().getMonument().getLat()));
         loc2.setLongitude(Double.parseDouble(getPresenter().getMonument().getLng()));
+        userMarker.setRotation(loc1.bearingTo(loc2));
+        mapView.getOverlays().add(userMarker);
+
         int distanceTo = (int)loc1.distanceTo(loc2);
         if (distanceTo >= 2000){
             Observable.just(1)
@@ -243,6 +252,23 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
             distance.setText(distanceTo + " м");
             distanceBlock.setVisibility(View.VISIBLE);
         }
+    }
+    private float angleFromCoordinate(double lat1, double long1, double lat2,
+                                       double long2) {
+
+        double dLon = (long2 - long1);
+
+        double y = Math.sin(dLon) * Math.cos(lat2);
+        double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
+                * Math.cos(lat2) * Math.cos(dLon);
+
+        double brng = Math.atan2(y, x);
+
+        brng = Math.toDegrees(brng);
+        brng = (brng + 360) % 360;
+        brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
+
+        return (float)brng;
     }
 
 }

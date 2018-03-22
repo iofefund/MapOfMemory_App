@@ -15,6 +15,11 @@ import org.mapofmemory.entities.MonumentEntityTable;
 
 public class MonumentPresenter extends AppMvpPresenter<MonumentView> {
     private String monumentId;
+    private MonumentEntity monumentEntity;
+
+    public MonumentEntity getMonumentEntity() {
+        return monumentEntity;
+    }
 
     public MonumentPresenter(Context context, String monumentId){
         super(context);
@@ -22,11 +27,13 @@ public class MonumentPresenter extends AppMvpPresenter<MonumentView> {
     }
 
     public void loadMonument(){
-        getView().onLoadMonument(mDataManager.storIOSQLite
+        this.monumentEntity = mDataManager.storIOSQLite
                 .get()
                 .object(MonumentEntity.class)
                 .withQuery(Query.builder().table(MonumentEntityTable.NAME).where("num = ?").whereArgs(monumentId).build())
                 .prepare()
-                .executeAsBlocking());
+                .executeAsBlocking();
+        getView().onLoadMonument(monumentEntity);
+
     }
 }

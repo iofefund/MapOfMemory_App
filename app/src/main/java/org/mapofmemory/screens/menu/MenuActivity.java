@@ -2,6 +2,7 @@ package org.mapofmemory.screens.menu;
 
 import android.Manifest;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -37,6 +39,10 @@ import io.reactivex.schedulers.Schedulers;
 public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implements MenuView, PermissionListener {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.status) TextView status;
+    @OnClick(R.id.btn_site) void onSite(){
+        Intent newInt = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mapofmemory.org/"));
+        startActivity(newInt);
+    }
     private boolean isGranted = false;
     private boolean isDataUpdated = false;
     @NonNull

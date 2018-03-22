@@ -63,6 +63,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     FrameLayout frame;
     @BindView(R.id.nav_view) NavigationView navigationView;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    private TextView placeNameView;
     private MaterialSpinner spinner;
     private TextView placeTitleView;
     private Menu menu;
@@ -87,6 +88,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         toggle.syncState();
         spinner = (MaterialSpinner) navigationView.getHeaderView(0).findViewById(R.id.spinner);
         placeTitleView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.place_title);
+        placeNameView = (TextView) navigationView.getHeaderView(0).findViewById(R.id.name);
         navigationView.setNavigationItemSelectedListener(this);
         spinner.setOnItemSelectedListener((MaterialSpinner view, int position, long id, Object item) -> {
             getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().getFragments().get(0)).commit();
@@ -174,6 +176,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     public void onPlaceSelected(PlaceEntity place, int index) {
         spinner.setSelectedIndex(index);
         placeTitleView.setText(place.getTitle());
+        placeNameView.setText(place.getTitle());
         drawer.setDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {

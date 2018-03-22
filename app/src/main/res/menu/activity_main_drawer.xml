@@ -30,9 +30,10 @@
             android:icon="@drawable/ic_home"
             android:title="Главная" />
         <item
+            android:visible="false"
             android:id="@+id/nav_lev"
             android:icon="@drawable/lev"
-            android:title="Левашово" />
+            android:title="Левашово  " />
     </group>
 
 

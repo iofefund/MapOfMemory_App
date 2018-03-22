@@ -53,6 +53,9 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
     @BindDrawable(R.drawable.ic_blue_marker) Drawable blueMarker;
     @BindDrawable(R.drawable.ic_red_marker) Drawable redMarker;
 
+    @OnClick(R.id.site) void onSite(){
+    }
+
     @OnClick(R.id.btn_route) void onRoute(){
         Intent newInt = new Intent(this, NavigatorActivity.class);
         newInt.putExtra("monument_id", getIntent().getStringExtra("monument_id"));
