@@ -217,8 +217,10 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         loc2.setLongitude(Double.parseDouble(getPresenter().getMonument().getLng()));
         userMarker.setRotation(loc1.bearingTo(loc2));
         mapView.getOverlays().add(userMarker);
-
         int distanceTo = (int)loc1.distanceTo(loc2);
+        distance.setText(distanceTo + " м");
+        distanceBlock.setVisibility(View.VISIBLE);
+        /*int distanceTo = (int)loc1.distanceTo(loc2);
         if (distanceTo >= 2000){
             Observable.just(1)
                     .subscribeOn(Schedulers.io())
@@ -251,7 +253,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
             mapView.invalidate();
             distance.setText(distanceTo + " м");
             distanceBlock.setVisibility(View.VISIBLE);
-        }
+        }*/
     }
     private float angleFromCoordinate(double lat1, double long1, double lat2,
                                        double long2) {

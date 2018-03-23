@@ -197,7 +197,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
 
             }
         });
-        getSupportActionBar().setTitle("Карта памятников");
+        getSupportActionBar().setTitle("Памятники");
         onMapFragment(place.getLat(), place.getLng());
     }
 
@@ -216,7 +216,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
 
     @Override
     public void onMapFragment(double lat, double lng) {
-        getSupportActionBar().setTitle("Карта памятников");
+        getSupportActionBar().setTitle("Памятники");
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, MapFragment.newInstance(getPresenter().getPlaceId(), lat, lng)).commit();
     }
 

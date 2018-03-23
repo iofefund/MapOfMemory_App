@@ -188,7 +188,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                             }
                         });
                         startMarker.setInfoWindow(monumentInfoWindow);
-                        startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
+                        startMarker.setAnchor(Marker.ANCHOR_BOTTOM, 1.0f);
                         startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
                         markers.add(startMarker);
                     return true;

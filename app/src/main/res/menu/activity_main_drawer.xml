@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:showIn="navigation_view">
-    <group>
+        <item
+            android:id="@+id/nav_monuments"
+            android:icon="@drawable/ic_monument"
+            android:title="Памятники" />
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_about"
             android:title="О" />
         <item
-            android:id="@+id/nav_monuments"
-            android:icon="@drawable/ic_monument"
-            android:title="Карта памятников" />
+            android:id="@+id/nav_articles"
+            android:icon="@drawable/ic_article"
+            android:title="Дни памяти" />
         <item
             android:id="@+id/nav_names"
             android:icon="@drawable/ic_person"
             android:title="Имена" />
         <item
-            android:id="@+id/nav_articles"
-            android:icon="@drawable/ic_article"
-            android:title="Дни памяти" />
-        <item
             android:id="@+id/nav_route"
             android:icon="@drawable/ic_navigation"
             android:title="Как добраться" />
-    </group>
-    <group>
-        <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/ic_home"
-            android:title="Главная" />
-        <item
-            android:visible="false"
-            android:id="@+id/nav_lev"
-            android:icon="@drawable/lev"
-            android:title="Левашово  " />
-    </group>
+    <item app:showAsAction="never" android:title="Приложение">
+        <menu>
+            <item
+                android:id="@+id/nav_home"
+                android:icon="@drawable/ic_home"
+                android:title="Главная" />
+            <item
+                android:id="@+id/nav_lev"
+                android:icon="@drawable/lev"
+                android:title="Левашово" />
+            <item
+                android:id="@+id/nav_sand"
+                android:icon="@drawable/lev"
+                android:title="Сандормох" />
+        </menu>
+    </item>
 
 
 </menu>

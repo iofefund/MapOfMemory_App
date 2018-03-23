@@ -31,15 +31,6 @@
         </RelativeLayout>
 
         <TextView
-            android:visibility="gone"
-            android:id="@+id/status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:text="Данные обновлены\n28.01.2018 20:05"
-            android:textColor="@android:color/white" />
-        <TextView
             android:layout_marginLeft="15dp"
             android:id="@+id/header"
             android:textSize="22dp"
@@ -65,25 +56,58 @@
             android:padding="8dp"
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></android.support.v7.widget.RecyclerView>
-        <mehdi.sakout.fancybuttons.FancyButton
+            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+        <LinearLayout
+            android:id="@+id/block"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:id="@+id/btn_site"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="10dp"
-            fancy:fb_borderColor="@color/colorPrimary"
-            android:layout_marginBottom="10dp"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="@android:color/transparent"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_radius="4dp"
-            fancy:fb_text="@string/official_site"
-            fancy:fb_textColor="#FFFFFF" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_height="wrap_content"
+                android:text="Данные обновлены: 28.01.2018 20:05"
+                android:textColor="@android:color/white" />
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btn_update"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp"
+                fancy:fb_borderColor="@color/colorPrimary"
+                android:layout_marginBottom="10dp"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="@android:color/transparent"
+                fancy:fb_focusColor="#9bd823"
+                fancy:fb_radius="4dp"
+                fancy:fb_text="Обновить данные"
+                fancy:fb_textColor="#FFFFFF" />
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btn_site"
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp"
+                fancy:fb_borderColor="@color/colorPrimary"
+                android:layout_marginBottom="10dp"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="@android:color/transparent"
+                fancy:fb_focusColor="#9bd823"
+                fancy:fb_radius="4dp"
+                fancy:fb_text="@string/official_site"
+                fancy:fb_textColor="#FFFFFF" />
+        </LinearLayout>
     </RelativeLayout>
 
 </LinearLayout>

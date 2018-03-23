@@ -77,6 +77,19 @@ public class MenuPresenter extends AppMvpPresenter<MenuView>{
                 });
     }
 
+    public void loadMonumentsFromCache(){
+        List<PlaceEntity> places = placesFromCache();
+        if (places.size() != 0){
+            long date = mDataManager.sharedPrefs.getLong("update_date");
+            getView().onDataFailed(new PrettyTime().format(new Date(date)));
+            getView().showPlaces(places);
+        }
+        else{
+            loadMonuments();
+        }
+
+    }
+
     private List<PlaceEntity> placesFromCache(){
         return mDataManager.storIOSQLite
                 .get()

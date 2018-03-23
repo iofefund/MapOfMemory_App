@@ -1,70 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="horizontal"
-    android:padding="10dp"
-    android:elevation="8dp"
-    android:background="@drawable/info_window"
+<LinearLayout android:layout_width="260dp"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="230dp"
-    android:layout_height="wrap_content"
+    android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ProgressBar
-            android:layout_centerInParent="true"
-            android:layout_width="24dp"
-            android:layout_height="24dp" />
-        <ImageView
-            android:id="@+id/image"
-            android:layout_gravity="top"
-            android:scaleType="centerCrop"
-            android:layout_width="70dp"
-            android:layout_height="70dp" />
-    </RelativeLayout>
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_marginLeft="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/type"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:text="Памятная табличка"
-            android:layout_gravity="top"
-            android:textSize="10dp"
+    <LinearLayout android:orientation="horizontal"
+        android:padding="10dp"
+        android:elevation="8dp"
+        android:background="@drawable/info_window"
+        android:layout_width="260dp"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    <TextView
-        android:id="@+id/title"
-        android:layout_marginTop="5dp"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:text="Расстрел с ангелом-хранителем"
-        android:layout_gravity="top"
-        android:textSize="12dp"
-        android:textColor="@android:color/black"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-        <mehdi.sakout.fancybuttons.FancyButton
-            android:id="@+id/btn_route"
-            android:layout_marginTop="5dp"
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="4dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="4dp"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="@android:color/holo_red_light"
-            fancy:fb_focusColor="@android:color/holo_red_dark"
-            fancy:fb_radius="15dp"
-            fancy:fb_textSize="12dp"
-            fancy:fb_text="Проложить маршрут"
-            fancy:fb_textColor="#FFFFFF" />
+            android:layout_height="wrap_content">
+            <ProgressBar
+                android:layout_centerInParent="true"
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+            <ImageView
+                android:id="@+id/image"
+                android:layout_gravity="top"
+                android:scaleType="centerCrop"
+                android:layout_width="70dp"
+                android:layout_height="70dp" />
+        </RelativeLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/type"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="Памятная табличка"
+                android:layout_gravity="top"
+                android:textSize="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_marginTop="5dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="Расстрел с ангелом-хранителем"
+                android:layout_gravity="top"
+                android:textSize="12dp"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_marginTop="5dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:text="Подробнее..."
+                android:layout_gravity="top"
+                android:textSize="12dp"
+                android:textColor="@android:color/holo_red_dark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <mehdi.sakout.fancybuttons.FancyButton
+                android:id="@+id/btn_route"
+                android:layout_marginTop="5dp"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:paddingTop="4dp"
+                fancy:fb_borderColor="#FFFFFF"
+                fancy:fb_borderWidth="1dp"
+                fancy:fb_defaultColor="@android:color/holo_red_light"
+                fancy:fb_focusColor="@android:color/holo_red_dark"
+                fancy:fb_radius="15dp"
+                fancy:fb_textSize="12dp"
+                fancy:fb_text="Проложить маршрут"
+                fancy:fb_textColor="#FFFFFF" />
+        </LinearLayout>
     </LinearLayout>
+    <ImageView
+        android:elevation="2dp"
+        android:background="@drawable/ic_triangle"
+        android:layout_marginTop="-25dp"
+        android:layout_gravity="center_horizontal|top"
+        android:layout_width="35dp"
+        android:layout_height="50dp" />
 </LinearLayout>

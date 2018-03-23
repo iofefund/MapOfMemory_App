@@ -22,6 +22,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import org.mapofmemory.FileManager;
 import org.mapofmemory.R;
 import org.mapofmemory.adapters.PlaceEntityAdapter;
+import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.screens.main.MainActivity;
 
@@ -43,6 +44,10 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
         Intent newInt = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mapofmemory.org/"));
         startActivity(newInt);
     }
+    @OnClick(R.id.btn_update) void onUpdate(){
+        status.setText("Идет обновление данных...");
+        getPresenter().loadPlaces();
+    }
     private boolean isGranted = false;
     private boolean isDataUpdated = false;
     @NonNull
@@ -60,8 +65,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
                 .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .withListener(this).check();
         ButterKnife.bind(this);
-        status.setText("Идет обновление данных...");
-        getPresenter().loadPlaces();
+        getPresenter().loadMonumentsFromCache();
     }
 
     @Override
