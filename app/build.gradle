@@ -87,4 +87,6 @@ dependencies {
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
     compile 'io.nlopez.smartlocation:library:3.3.3'
     implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
+    compile 'com.github.mancj:MaterialSearchBar:0.7.6'
+
 }

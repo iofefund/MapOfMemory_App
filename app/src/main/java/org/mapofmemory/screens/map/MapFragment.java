@@ -8,14 +8,19 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
+import com.mancj.materialsearchbar.MaterialSearchBar;
+import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
@@ -26,6 +31,7 @@ import com.orhanobut.dialogplus.ViewHolder;
 import org.mapofmemory.AppConfig;
 import org.mapofmemory.MonumentInfoWindow;
 import org.mapofmemory.R;
+import org.mapofmemory.adapters.CustomSuggestionsAdapter;
 import org.mapofmemory.adapters.SearchAdapter;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.main.MainActivity;
@@ -223,6 +229,76 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                 .toList()
                 .blockingGet();
         suggestions = AppConfig.removeTheDuplicates(suggestions);
+        CustomSuggestionsAdapter customSuggestionsAdapter = new CustomSuggestionsAdapter(getLayoutInflater());
+        customSuggestionsAdapter.setOnSuggestionClickListener(new CustomSuggestionsAdapter.OnSuggestionClickListener() {
+            @Override
+            public void onClick(MonumentEntity monumentEntity) {
+                List<MonumentEntity> m = new ArrayList<>();
+                m.add(monumentEntity);
+                Disposable ob = Observable.just(1)
+                        .delay(100, TimeUnit.MILLISECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(res ->{
+                            showMonuments(m, getPresenter().place.getImgRoot());
+                            if (m.size() == 1){
+                                map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
+                                map.invalidate();
+                            }
+                        });
+            }
+        });
+
+        customSuggestionsAdapter.setSuggestions(monuments);
+        ((MainActivity)activity).searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
+        ((MainActivity)activity).searchBar.addTextChangeListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                customSuggestionsAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        ((MainActivity)activity).searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+            @Override
+            public void onSearchStateChanged(boolean enabled) {
+                Toast.makeText(activity, enabled + "", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSearchConfirmed(CharSequence text) {
+                List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
+                        .filter(monumentEntity -> {
+                            return monumentEntity.getType().equals("1") ? monumentEntity.getKeywords().toLowerCase().contains(text.toString().toLowerCase()) : monumentEntity.getName().toLowerCase().contains(text.toString().toLowerCase());
+                        })
+                        .toList()
+                        .blockingGet();
+                Disposable ob = Observable.just(1)
+                        .delay(100, TimeUnit.MILLISECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(res ->{
+                            showMonuments(m, getPresenter().place.getImgRoot());
+                            ((MainActivity)activity).searchBar.hideSuggestionsList();
+                            if (m.size() == 1){
+                                map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
+                                map.invalidate();
+                            }
+                        });
+            }
+
+            @Override
+            public void onButtonClicked(int buttonCode) {
+                Toast.makeText(getActivity(), buttonCode + "!", Toast.LENGTH_LONG).show();
+            }
+        });
+        //((MainActivity)activity).searchBar.setLastSuggestions(suggestions);
         ((MainActivity)activity).searchView.setAdapter(new SearchAdapter(activity, suggestions.toArray(new String[suggestions.size()]), monuments));
         ((MainActivity)activity).searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override

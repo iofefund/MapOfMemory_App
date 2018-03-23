@@ -29,6 +29,7 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
@@ -59,6 +60,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.toolbar) Toolbar toolbar;
     public @BindView(R.id.search_view) MaterialSearchView searchView;
+    public @BindView(R.id.searchBar) MaterialSearchBar searchBar;
     @BindView(R.id.frame)
     FrameLayout frame;
     @BindView(R.id.nav_view) NavigationView navigationView;
