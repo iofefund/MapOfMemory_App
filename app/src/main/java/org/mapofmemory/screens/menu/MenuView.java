@@ -14,4 +14,5 @@ public interface MenuView extends MvpView {
     void showPlaces(List<PlaceEntity> places);
     void onDataSuccess(String date);
     void onDataFailed(String date);
+    void onDataUpdating();
 }

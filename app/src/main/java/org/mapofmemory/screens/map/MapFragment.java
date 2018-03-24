@@ -1,6 +1,7 @@
 package org.mapofmemory.screens.map;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -65,6 +67,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     @BindDrawable(R.drawable.ic_red_marker) Drawable redMarker;
     @BindView(R.id.viewpagertab) SmartTabLayout smartTabLayout;
     @BindView(R.id.viewpager) ViewPager viewPager;
+    @BindView(R.id.searchBar) MaterialSearchBar searchBar;
 
     private DialogPlus dialogPlus;
     private Activity activity;
@@ -93,6 +96,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        ((ImageView)searchBar.findViewById(R.id.mt_nav)).setImageResource(R.drawable.ic_search);
         progressBar.setVisibility(View.VISIBLE);
         this.activity = getActivity();
         map.setTileSource(TileSourceFactory.MAPNIK);
@@ -129,6 +133,9 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     @Override
     public void onTabClicked(int position) {
         pos = position;
+        if (searchBar.isSearchEnabled()) {
+            searchBar.disableSearch();
+        }
         if (position == 0){
             showMonuments(getPresenter().getMonuments(), getPresenter().place.getImgRoot());
         }
@@ -206,6 +213,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                     progressBar.setVisibility(View.GONE);
                     map.invalidate();
                     map.setVisibility(View.VISIBLE);
+                    searchBar.setVisibility(View.VISIBLE);
                     smartTabLayout.setVisibility(View.VISIBLE);
                 });
     }
@@ -229,14 +237,23 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                 .toList()
                 .blockingGet();
         suggestions = AppConfig.removeTheDuplicates(suggestions);
+        final List<String> suggs = suggestions;
         CustomSuggestionsAdapter customSuggestionsAdapter = new CustomSuggestionsAdapter(getLayoutInflater());
         customSuggestionsAdapter.setOnSuggestionClickListener(new CustomSuggestionsAdapter.OnSuggestionClickListener() {
             @Override
-            public void onClick(MonumentEntity monumentEntity) {
-                List<MonumentEntity> m = new ArrayList<>();
-                m.add(monumentEntity);
+            public void onClick(String text) {
+                List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
+                        .filter(monumentEntity -> {
+                            return monumentEntity.getType().equals("1") ? monumentEntity.getKeywords().toLowerCase().contains(text.toString().toLowerCase()) : monumentEntity.getName().toLowerCase().contains(text.toString().toLowerCase());
+                        })
+                        .toList()
+                        .blockingGet();
+                searchBar.hideSuggestionsList();
+                InputMethodManager imm =(InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchBar.getWindowToken(), 0);
+                //searchBar.
                 Disposable ob = Observable.just(1)
-                        .delay(100, TimeUnit.MILLISECONDS)
+                        .delay(300, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(res ->{
                             showMonuments(m, getPresenter().place.getImgRoot());
@@ -244,13 +261,18 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                                 map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
                                 map.invalidate();
                             }
+                            searchBar.setText(text);
+                            //searchBar.disableSearch();
+                            /*onMarkerClick(Observable.fromIterable(markers)
+                                    .filter(marker -> marker.getTitle().equals("Marker" + m.get(0).getId()))
+                                    .blockingFirst(), map);*/
                         });
             }
         });
 
-        customSuggestionsAdapter.setSuggestions(monuments);
-        ((MainActivity)activity).searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
-        ((MainActivity)activity).searchBar.addTextChangeListener(new TextWatcher() {
+        customSuggestionsAdapter.setSuggestions(suggestions);
+        searchBar.setCustomSuggestionAdapter(customSuggestionsAdapter);
+        searchBar.addTextChangeListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -266,10 +288,12 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
 
             }
         });
-        ((MainActivity)activity).searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+        searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
             @Override
             public void onSearchStateChanged(boolean enabled) {
-                Toast.makeText(activity, enabled + "", Toast.LENGTH_SHORT).show();
+                if (!enabled){
+                    ((ImageView)searchBar.findViewById(R.id.mt_nav)).setImageResource(R.drawable.ic_search);
+                }
             }
 
             @Override
@@ -280,90 +304,33 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                         })
                         .toList()
                         .blockingGet();
+                searchBar.hideSuggestionsList();
+                InputMethodManager imm =(InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchBar.getWindowToken(), 0);
+                //searchBar.
                 Disposable ob = Observable.just(1)
                         .delay(100, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(res ->{
                             showMonuments(m, getPresenter().place.getImgRoot());
-                            ((MainActivity)activity).searchBar.hideSuggestionsList();
                             if (m.size() == 1){
                                 map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
                                 map.invalidate();
                             }
+                            /*onMarkerClick(Observable.fromIterable(markers)
+                                    .filter(marker -> marker.getTitle().equals("Marker" + m.get(0).getId()))
+                                    .blockingFirst(), map);*/
                         });
             }
 
             @Override
             public void onButtonClicked(int buttonCode) {
-                Toast.makeText(getActivity(), buttonCode + "!", Toast.LENGTH_LONG).show();
+                if (buttonCode == MaterialSearchBar.BUTTON_BACK){
+                    onTabClicked(pos);
+                }
             }
         });
-        //((MainActivity)activity).searchBar.setLastSuggestions(suggestions);
-        ((MainActivity)activity).searchView.setAdapter(new SearchAdapter(activity, suggestions.toArray(new String[suggestions.size()]), monuments));
-        ((MainActivity)activity).searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
-            @Override
-            public void onSearchViewShown() {
-
-            }
-
-            @Override
-            public void onSearchViewClosed() {
-                onTabClicked(pos);
-            }
-        });
-        ((MainActivity)activity).searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
-                        .filter(monumentEntity -> {
-                            return monumentEntity.getType().equals("1") ? monumentEntity.getKeywords().toLowerCase().contains(query.toLowerCase()) : monumentEntity.getName().toLowerCase().contains(query.toLowerCase());
-                        })
-                        .toList()
-                        .blockingGet();
-                ((MainActivity)activity).searchView.dismissSuggestions();
-                ((MainActivity)activity).searchView.hideKeyboard(((MainActivity)activity).searchView);
-                ((MainActivity)activity).searchView.setQuery("", false);
-                Disposable ob = Observable.just(1)
-                        .delay(100, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(res ->{
-                            showMonuments(m, getPresenter().place.getImgRoot());
-                            if (m.size() == 1){
-                                map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
-                                map.invalidate();
-                            }
-                            //      onMarkerCli
-            });
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-        ((MainActivity)activity).searchView.setOnItemClickListener(((parent, view, position, id) -> {
-            TextView suggestion = (TextView) view.findViewById(R.id.suggestion_text);
-            List<MonumentEntity> m = Observable.fromIterable(getPresenter().getMonuments())
-                    .filter(monumentEntity -> {
-                        return monumentEntity.getType().equals("1") ? monumentEntity.getKeywords().equals(suggestion.getText().toString()) : monumentEntity.getName().equals(suggestion.getText().toString());
-                    })
-                    .toList()
-                    .blockingGet();
-            ((MainActivity)activity).searchView.dismissSuggestions();
-            ((MainActivity)activity).searchView.hideKeyboard(((MainActivity)activity).searchView);
-            Disposable ob = Observable.just(1)
-                    .delay(100, TimeUnit.MILLISECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(res ->{
-                        showMonuments(m, getPresenter().place.getImgRoot());
-                        if (m.size() == 1){
-                            map.getController().setCenter(new GeoPoint(Float.parseFloat(m.get(0).getLat()), Float.parseFloat(m.get(0).getLng())));
-                            map.invalidate();
-                        }
-                 //       onMarkerClick(Observable.fromIterable(markers).filter(marker -> marker.getTitle().equals("Marker" + m.getId())).blockingFirst(), map);
-                    });
-        }));
+        //searchBar.setLastSuggestions(suggestions);
     }
 
     public static MapFragment newInstance(int placeId, double lat, double lng) {

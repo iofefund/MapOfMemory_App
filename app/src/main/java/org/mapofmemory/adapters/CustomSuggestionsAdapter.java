@@ -26,9 +26,9 @@ import java.util.List;
  * Created by The Tronuo on 23.03.2018.
  */
 
-public class CustomSuggestionsAdapter extends SuggestionsAdapter<MonumentEntity, CustomSuggestionsAdapter.SuggestionHolder> implements Filterable{
+public class CustomSuggestionsAdapter extends SuggestionsAdapter<String, CustomSuggestionsAdapter.SuggestionHolder> implements Filterable{
     public interface OnSuggestionClickListener{
-        void onClick(MonumentEntity monumentEntity);
+        void onClick(String monumentEntity);
     }
     private OnSuggestionClickListener onSuggestionClickListener;
 
@@ -52,8 +52,8 @@ public class CustomSuggestionsAdapter extends SuggestionsAdapter<MonumentEntity,
     }
 
     @Override
-    public void onBindSuggestionHolder(MonumentEntity suggestion, SuggestionHolder holder, int position) {
-        holder.title.setText(suggestion.getType().equals("1") ? suggestion.getKeywords() : suggestion.getName());
+    public void onBindSuggestionHolder(String suggestion, SuggestionHolder holder, int position) {
+        holder.title.setText(suggestion);
         holder.itemView.setOnClickListener((View v) -> onSuggestionClickListener.onClick(suggestion));
         //holder.subtitle.setText("The price is " + suggestion.getPrice() + "$");
     }
@@ -68,9 +68,8 @@ public class CustomSuggestionsAdapter extends SuggestionsAdapter<MonumentEntity,
                     suggestions = suggestions_clone;
                 else {
                     suggestions = new ArrayList<>();
-                    for (MonumentEntity item: suggestions_clone) {
-                        String s = item.getType().equals("1") ? item.getKeywords() : item.getName();
-                        if (s.toLowerCase().contains(term.toLowerCase()))
+                    for (String item: suggestions_clone) {
+                        if (item.toLowerCase().contains(term.toLowerCase()))
                             suggestions.add(item);
                     }
                 }
@@ -80,7 +79,7 @@ public class CustomSuggestionsAdapter extends SuggestionsAdapter<MonumentEntity,
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                suggestions = (List<MonumentEntity>) results.values;
+                suggestions = (List<String>) results.values;
                 notifyDataSetChanged();
             }
         };

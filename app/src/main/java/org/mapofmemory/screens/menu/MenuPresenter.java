@@ -85,7 +85,8 @@ public class MenuPresenter extends AppMvpPresenter<MenuView>{
             getView().showPlaces(places);
         }
         else{
-            loadMonuments();
+            getView().onDataUpdating();
+            loadPlaces();
         }
 
     }

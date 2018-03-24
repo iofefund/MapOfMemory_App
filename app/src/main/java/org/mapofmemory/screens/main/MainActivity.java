@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -59,8 +60,6 @@ import io.reactivex.Observable;
 public class MainActivity extends MvpActivity<MainView, MainPresenter>
         implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.toolbar) Toolbar toolbar;
-    public @BindView(R.id.search_view) MaterialSearchView searchView;
-    public @BindView(R.id.searchBar) MaterialSearchBar searchBar;
     @BindView(R.id.frame)
     FrameLayout frame;
     @BindView(R.id.nav_view) NavigationView navigationView;
@@ -121,8 +120,6 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         this.menu = menu;
-        MenuItem item = menu.findItem(R.id.action_search);
-        searchView.setMenuItem(item);
         return true;
     }
 
@@ -140,24 +137,25 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
             super.onBackPressed();
         }
         else if (id == R.id.nav_about){
-            menu.findItem(R.id.action_search).setVisible(false);
             onAboutFragment(getPresenter().getPlaceId());
         }
         else if (id == R.id.nav_route){
-            menu.findItem(R.id.action_search).setVisible(false);
             onRouteFragment(getPresenter().getPlaceId());
         }
         else if (id == R.id.nav_articles){
-            menu.findItem(R.id.action_search).setVisible(false);
             onDOMFragment(getPresenter().getPlaceId());
         }
         else if (id == R.id.nav_monuments){
-            menu.findItem(R.id.action_search).setVisible(true);
             getPresenter().loadPlaces();
         }
         else if (id == R.id.nav_names){
-            menu.findItem(R.id.action_search).setVisible(false);
             onPersonsFragment(getPresenter().getPlaceId());
+        }
+        else if (id == R.id.nav_lev){
+            getPresenter().changePlace(1);
+        }
+        else if (id == R.id.nav_sand){
+            getPresenter().changePlace(0);
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -199,38 +197,38 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
 
             }
         });
-        getSupportActionBar().setTitle("Памятники");
+        getSupportActionBar().setTitle(place.getTitle());
         onMapFragment(place.getLat(), place.getLng());
     }
 
     @Override
     public void onPersonsFragment(int placeId) {
-        getSupportActionBar().setTitle("Имена");
+        //getSupportActionBar().setTitle("Имена");
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, NamesFragment.newInstance(getPresenter().getPlaceId())).commit();
 
     }
 
     @Override
     public void onDOMFragment(int placeId) {
-        getSupportActionBar().setTitle("Дни памяти");
+        //getSupportActionBar().setTitle("Дни памяти");
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, DOMFragment.newInstance(getPresenter().getPlaceId())).commit();
     }
 
     @Override
     public void onMapFragment(double lat, double lng) {
-        getSupportActionBar().setTitle("Памятники");
+        //getSupportActionBar().setTitle("Памятники");
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, MapFragment.newInstance(getPresenter().getPlaceId(), lat, lng)).commit();
     }
 
     @Override
     public void onAboutFragment(int placeId) {
-        getSupportActionBar().setTitle(getPresenter().getCurrentPlace().getAboutTitle());
+        //getSupportActionBar().setTitle(getPresenter().getCurrentPlace().getAboutTitle());
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, AboutFragment.newInstance(placeId)).commit();
     }
 
     @Override
     public void onRouteFragment(int placeId) {
-        getSupportActionBar().setTitle("Как добраться");
+        //getSupportActionBar().setTitle("Как добраться");
         MainActivity.this.getSupportFragmentManager().beginTransaction().replace(R.id.frame, RouteFragment.newInstance(placeId)).commit();
     }
 

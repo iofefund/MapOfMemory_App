@@ -16,6 +16,7 @@
             android:icon="@drawable/ic_article"
             android:title="Дни памяти" />
         <item
+            android:visible="false"
             android:id="@+id/nav_names"
             android:icon="@drawable/ic_person"
             android:title="Имена" />

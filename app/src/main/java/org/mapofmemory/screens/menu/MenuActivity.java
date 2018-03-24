@@ -57,6 +57,11 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
     }
 
     @Override
+    public void onDataUpdating() {
+        status.setText("Идет обновление данных...");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
