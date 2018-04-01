@@ -1,5 +1,5 @@
 <android.support.v7.widget.CardView android:layout_width="match_parent"
-    android:layout_height="350dp"
+    android:layout_height="335dp"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     card_view:cardBackgroundColor="@android:color/white"
     card_view:cardElevation="8dp"
@@ -67,19 +67,22 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
+
         <RelativeLayout
             android:id="@+id/offBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@android:color/holo_green_dark"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:visibility="gone">
+
             <TextView
-                android:textSize="12dp"
-                android:textColor="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Разрешено для использования офлайн"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:textColor="@android:color/white"
+                android:textSize="12dp" />
         </RelativeLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

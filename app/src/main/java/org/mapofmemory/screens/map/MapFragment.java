@@ -288,6 +288,13 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
 
             }
         });
+        searchBar.findViewById(R.id.mt_clear).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onTabClicked(0);
+
+            }
+        });
         searchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
             @Override
             public void onSearchStateChanged(boolean enabled) {
@@ -328,6 +335,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                 if (buttonCode == MaterialSearchBar.BUTTON_BACK){
                     onTabClicked(pos);
                 }
+                Toast.makeText(getActivity(), buttonCode + "!", Toast.LENGTH_LONG).show();
             }
         });
         //searchBar.setLastSuggestions(suggestions);

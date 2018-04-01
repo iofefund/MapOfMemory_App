@@ -5,6 +5,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -54,6 +55,8 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
     @BindDrawable(R.drawable.ic_red_marker) Drawable redMarker;
 
     @OnClick(R.id.site) void onSite(){
+        Intent newInt = new Intent(Intent.ACTION_VIEW, Uri.parse(getPresenter().getPlace().getUrl() + "/monument/?m_id=" + getPresenter().getMonumentEntity().getId()));
+        startActivity(newInt);
     }
 
     @OnClick(R.id.btn_route) void onRoute(){

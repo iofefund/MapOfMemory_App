@@ -8,6 +8,8 @@ import com.pushtorefresh.storio3.sqlite.queries.Query;
 import org.mapofmemory.AppMvpPresenter;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.entities.MonumentEntityTable;
+import org.mapofmemory.entities.PlaceEntity;
+import org.mapofmemory.entities.PlaceEntityTable;
 
 /**
  * Created by The Tronuo on 29.01.2018.
@@ -16,6 +18,7 @@ import org.mapofmemory.entities.MonumentEntityTable;
 public class MonumentPresenter extends AppMvpPresenter<MonumentView> {
     private String monumentId;
     private MonumentEntity monumentEntity;
+    private PlaceEntity place;
 
     public MonumentEntity getMonumentEntity() {
         return monumentEntity;
@@ -26,6 +29,10 @@ public class MonumentPresenter extends AppMvpPresenter<MonumentView> {
         this.monumentId = monumentId;
     }
 
+    public PlaceEntity getPlace() {
+        return place;
+    }
+
     public void loadMonument(){
         this.monumentEntity = mDataManager.storIOSQLite
                 .get()
@@ -34,6 +41,12 @@ public class MonumentPresenter extends AppMvpPresenter<MonumentView> {
                 .prepare()
                 .executeAsBlocking();
         getView().onLoadMonument(monumentEntity);
+        place = mDataManager.storIOSQLite
+                .get()
+                .object(PlaceEntity.class)
+                .withQuery(Query.builder().table(PlaceEntityTable.NAME).where("id = ?").whereArgs(monumentEntity.getPlaceId()).build())
+                .prepare()
+                .executeAsBlocking();
 
     }
 }
