@@ -8,6 +8,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -61,6 +63,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
+import io.nlopez.smartlocation.location.config.LocationAccuracy;
 import io.nlopez.smartlocation.location.config.LocationParams;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -102,6 +105,28 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         else{
             getSupportActionBar().setTitle("Назад к описанию");
         }
+        SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+
+        SensorListener mySensorEventListener = new SensorListener() {
+            @Override
+            public void onSensorChanged(int sensor, float[] values) {
+                float mHeading = values[0];
+               // mapView.setMapOrientation(-mHeading);
+                if (userMarker != null){
+                    userMarker.setRotation(mHeading);
+                }
+                Log.d("Heading", mHeading + "");
+            }
+
+            @Override
+            public void onAccuracyChanged(int sensor, int accuracy) {
+
+            }
+        };
+        mSensorManager.registerListener(mySensorEventListener,
+                SensorManager.SENSOR_ORIENTATION,
+                SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -137,7 +162,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
-                        SmartLocation.with(getApplicationContext()).location().config(LocationParams.NAVIGATION)
+                        SmartLocation.with(getApplicationContext()).location().config((new LocationParams.Builder()).setAccuracy(LocationAccuracy.HIGH).setDistance(0.0F).setInterval(2000L).build())
                                 .start(NavigatorActivity.this);
                     }
 
@@ -156,6 +181,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
 
     @Override
     public void onLocationUpdated(Location location) {
+        mapView.getOverlays().clear();
         updateMap(location.getLatitude(), location.getLongitude());
         //updateMap(62.8878098, 34.6796229);
         //updateMap(59.9171483,30.0448854);
@@ -174,8 +200,10 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         mapView.invalidate();
         return true;
     }
+    private Marker userMarker = null;
 
     private void updateMap(double userLat, double userLng){
+        userMarker = null;
         mapView.getOverlayManager().clear();
         mapView.getOverlays().clear();
         Location loc1 = new Location("");
@@ -200,11 +228,11 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         monumentMarker.setInfoWindow(monumentInfoWindow);
         monumentMarker.showInfoWindow();
         monumentInfoWindow.hideBtn();
-        Marker userMarker = new Marker(mapView);
+        userMarker = new Marker(mapView);
         userMarker.setPosition(new GeoPoint(userLat, userLng));
         float angle = /*- (180*/ 90 - angleFromCoordinate(userLat, userLng, endPoint.getLatitude(), endPoint.getLongitude());
         userMarker.setRotation(angle);
-        userMarker.setAnchor(Marker.ANCHOR_CENTER, 0);
+        userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
         userMarker.setInfoWindow(null);
         userMarker.setIcon(getDrawable(R.drawable.marker));
 

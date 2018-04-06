@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,11 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
+
+import net.gotev.speech.GoogleVoiceTypingDisabledException;
+import net.gotev.speech.Speech;
+import net.gotev.speech.SpeechDelegate;
+import net.gotev.speech.SpeechRecognitionNotAvailable;
 
 import org.mapofmemory.AppConfig;
 import org.mapofmemory.MonumentInfoWindow;
@@ -335,7 +341,50 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                 if (buttonCode == MaterialSearchBar.BUTTON_BACK){
                     onTabClicked(pos);
                 }
-                Toast.makeText(getActivity(), buttonCode + "!", Toast.LENGTH_LONG).show();
+                else if (buttonCode == MaterialSearchBar.BUTTON_SPEECH){
+                    try {
+                        // you must have android.permission.RECORD_AUDIO granted at this point
+                        Speech.getInstance().startListening(new SpeechDelegate() {
+                            @Override
+                            public void onStartOfSpeech() {
+                                Log.i("speech", "speech recognition is now active");
+                            }
+
+                            @Override
+                            public void onSpeechRmsChanged(float value) {
+                                Log.d("speech", "rms is now: " + value);
+                            }
+
+                            @Override
+                            public void onSpeechPartialResults(List<String> results) {
+                                StringBuilder str = new StringBuilder();
+                                for (String res : results) {
+                                    str.append(res).append(" ");
+                                }
+
+                                Log.i("speech", "partial result: " + str.toString().trim());
+                            }
+
+                            @Override
+                            public void onSpeechResult(String result) {
+                                searchBar.setText(result);
+                                searchBar.performClick();
+                                Log.i("speech", "result: " + result);
+                            }
+                        });
+                    } catch (SpeechRecognitionNotAvailable exc) {
+                        Log.e("speech", "Speech recognition is not available on this device!");
+                        // You can prompt the user if he wants to install Google App to have
+                        // speech recognition, and then you can simply call:
+                        //
+                        // SpeechUtil.redirectUserToGoogleAppOnPlayStore(this);
+                        //
+                        // to redirect the user to the Google App page on Play Store
+                    } catch (GoogleVoiceTypingDisabledException exc) {
+                        Log.e("speech", "Google voice typing must be enabled!");
+                    }
+                }
+                //Toast.makeText(getActivity(), buttonCode + "!", Toast.LENGTH_LONG).show();
             }
         });
         //searchBar.setLastSuggestions(suggestions);

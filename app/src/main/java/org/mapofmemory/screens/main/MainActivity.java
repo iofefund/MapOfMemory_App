@@ -35,6 +35,8 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
 
+import net.gotev.speech.Speech;
+
 import org.mapofmemory.R;
 import org.mapofmemory.entities.PlaceEntity;
 import org.mapofmemory.screens.about.AboutFragment;
@@ -82,7 +84,7 @@ public class MainActivity extends MvpActivity<MainView, MainPresenter>
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setElevation(0);
-
+        Speech.init(this, getPackageName());
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
