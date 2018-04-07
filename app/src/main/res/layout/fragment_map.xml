@@ -59,6 +59,7 @@
         android:visibility="gone"
         app:donut_unfinished_color="@android:color/darker_gray"
         app:donut_finished_color="@color/colorPrimary"
+        app:donut_text_color="@color/colorPrimaryDark"
         android:id="@+id/donut_progress1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
