@@ -1,5 +1,6 @@
 package org.mapofmemory.entities;
 
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -98,6 +99,27 @@ public class MonumentEntity {
         Type biographyIdsType = new TypeToken<List<String>>(){}.getType();
         this.biographyIds = gson.fromJson(biographyIdsJson, biographyIdsType);
     }
+
+    public MonumentEntity(Cursor c){
+        this.num = c.getInt(c.getColumnIndex(MonumentEntityTable.NUM_COLUMN));
+        this.id = c.getString(c.getColumnIndex(MonumentEntityTable.ID_COLUMN));
+        this.placeId = c.getInt(c.getColumnIndex(MonumentEntityTable.PLACE_ID_COLUMN));
+        this.keywords = c.getString(c.getColumnIndex(MonumentEntityTable.KEYWORDS_COLUMN));
+        this.biographyIdsJson = c.getString(c.getColumnIndex(MonumentEntityTable.BIOGRAPHY_IDS_JSON_COLUMN));;
+        this.idRelation = c.getString(c.getColumnIndex(MonumentEntityTable.ID_RELATION_COLUMN));;
+        this.name = c.getString(c.getColumnIndex(MonumentEntityTable.NAME_COLUMN));
+        this.desc = c.getString(c.getColumnIndex(MonumentEntityTable.DESC_COLUMN));
+        this.type = c.getString(c.getColumnIndex(MonumentEntityTable.TYPE_COLUMN));
+        this.lat = c.getString(c.getColumnIndex(MonumentEntityTable.LAT_COLUMN));
+        this.lng = c.getString(c.getColumnIndex(MonumentEntityTable.LNG_COLUMN));
+        this.imgs_json = c.getString(c.getColumnIndex(MonumentEntityTable.IMGSJSON_COLUMN));;
+        Gson gson = new Gson();
+        Type monumentImgType = new TypeToken<List<MonumentImgEntity>>(){}.getType();
+        this.imgs = gson.fromJson(imgs_json, monumentImgType);
+        Type biographyIdsType = new TypeToken<List<String>>(){}.getType();
+        this.biographyIds = gson.fromJson(biographyIdsJson, biographyIdsType);
+    }
+
 
     public int getNum() {
         return num;

@@ -1,7 +1,8 @@
 <RelativeLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/tools">
     <LinearLayout
         android:id="@+id/block"
         android:orientation="vertical"
@@ -53,6 +54,15 @@
         android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"></android.support.v4.view.ViewPager>
+    <com.github.lzyzsd.circleprogress.DonutProgress
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:donut_unfinished_color="@android:color/darker_gray"
+        app:donut_finished_color="@color/colorPrimary"
+        android:id="@+id/donut_progress1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        custom:donut_progress="0"/>
     <ProgressBar
         android:id="@+id/progress"
         android:visibility="gone"

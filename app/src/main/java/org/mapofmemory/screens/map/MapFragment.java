@@ -21,6 +21,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.lzyzsd.circleprogress.CircleProgress;
+import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.hannesdorfmann.mosby3.mvp.MvpFragment;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.mancj.materialsearchbar.adapter.SuggestionsAdapter;
@@ -74,11 +76,21 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     @BindView(R.id.viewpagertab) SmartTabLayout smartTabLayout;
     @BindView(R.id.viewpager) ViewPager viewPager;
     @BindView(R.id.searchBar) MaterialSearchBar searchBar;
-
+    @BindView(R.id.donut_progress1) DonutProgress circleProgress;
     private DialogPlus dialogPlus;
     private Activity activity;
     private List<MonumentEntity> monuments;
     private MaterialSearchView searchView;
+
+    @Override
+    public void onProgress(int progress, int total) {
+        if (circleProgress.getVisibility() == View.GONE){
+            circleProgress.setVisibility(View.VISIBLE);
+        }
+        int percentage = Math.round((progress * 100.0f) / (total * 1.0f));
+        circleProgress.setProgress(percentage);
+    }
+
     @Override
     public MapPresenter createPresenter() {
         return new MapPresenter(this, getContext(), getArguments().getInt("place_id"));
@@ -103,7 +115,6 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         ((ImageView)searchBar.findViewById(R.id.mt_nav)).setImageResource(R.drawable.ic_search);
-        progressBar.setVisibility(View.VISIBLE);
         this.activity = getActivity();
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.getController().setZoom(18);
@@ -160,10 +171,12 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     }
 
     private Disposable disp = null;
+    private int z = 0;
 
     @Override
     public void showMonuments(List<MonumentEntity> monuments, String imgRoot) {
         //smartTabLayout.setVisibility(View.GONE);
+        z++;
         for (Marker marker1 : markers){
             if (marker1.isInfoWindowShown()) marker1.closeInfoWindow();
         }
@@ -173,11 +186,11 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         this.monuments = monuments;
         initSearchView();
         map.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
+        circleProgress.setVisibility(View.VISIBLE);
         disp = Flowable.fromIterable(monuments)
                 .subscribeOn(Schedulers.io())
                 .filter(monumentEntity ->{
-                        GeoPoint startPoint = new GeoPoint(Double.parseDouble(monumentEntity.getLat()), Double.parseDouble(monumentEntity.getLng()));
+                     GeoPoint startPoint = new GeoPoint(Double.parseDouble(monumentEntity.getLat()), Double.parseDouble(monumentEntity.getLng()));
                         Marker startMarker = new Marker(map);
                         startMarker.setOnMarkerClickListener(this);
                         startMarker.setPosition(startPoint);
@@ -210,17 +223,24 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                         startMarker.setAnchor(Marker.ANCHOR_BOTTOM, 1.0f);
                         startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
                         markers.add(startMarker);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onProgress(monuments.size() + markers.size(), z == 1 ? monuments.size() * 2 : monuments.size());
+                        }
+                    });
                     return true;
                 })
                 .toList()
                 .filter(v -> {map.getOverlays().addAll(markers); return true;})
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(monumentEntities -> {
-                    progressBar.setVisibility(View.GONE);
                     map.invalidate();
                     map.setVisibility(View.VISIBLE);
                     searchBar.setVisibility(View.VISIBLE);
                     smartTabLayout.setVisibility(View.VISIBLE);
+                    circleProgress.setProgress(100);
+                    circleProgress.setVisibility(View.GONE);
                 });
     }
 

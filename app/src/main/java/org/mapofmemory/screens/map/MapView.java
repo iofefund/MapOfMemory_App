@@ -13,4 +13,5 @@ import java.util.List;
 
 public interface MapView extends MvpView {
     void showMonuments(List<MonumentEntity> monuments, String imgRoot);
+    void onProgress(int progress, int total);
 }
