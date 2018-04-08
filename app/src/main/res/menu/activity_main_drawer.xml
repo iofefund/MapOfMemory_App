@@ -32,11 +32,11 @@
                 android:title="Главная" />
             <item
                 android:id="@+id/nav_lev"
-                android:icon="@drawable/lev"
+                android:icon="@drawable/ic_lev"
                 android:title="Левашово" />
             <item
                 android:id="@+id/nav_sand"
-                android:icon="@drawable/lev"
+                android:icon="@drawable/ic_sand"
                 android:title="Сандормох" />
         </menu>
     </item>
