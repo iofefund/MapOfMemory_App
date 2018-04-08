@@ -87,6 +87,8 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
         if (circleProgress.getVisibility() == View.GONE){
             circleProgress.setVisibility(View.VISIBLE);
         }
+        searchBar.setFocusable(false);
+        searchBar.setClickable(false);
         int percentage = Math.round((progress * 100.0f) / (total * 1.0f));
         circleProgress.setProgress(percentage);
     }
@@ -238,6 +240,8 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                     map.invalidate();
                     map.setVisibility(View.VISIBLE);
                     searchBar.setVisibility(View.VISIBLE);
+                    searchBar.setFocusable(true);
+                    searchBar.setClickable(true);
                     smartTabLayout.setVisibility(View.VISIBLE);
                     circleProgress.setProgress(100);
                     circleProgress.setVisibility(View.GONE);
@@ -257,6 +261,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
     }
 
     public void initSearchView(){
+        searchBar.findViewById(R.id.mt_search).setVisibility(View.GONE);
         List<String> suggestions = Observable.fromIterable(monuments)
                 .filter(monumentEntity -> !monumentEntity.getKeywords().isEmpty() || !monumentEntity.getName().isEmpty())
                 .map(monumentEntity -> monumentEntity.getType().equals("1") ? monumentEntity.getKeywords() : monumentEntity.getName())
@@ -318,6 +323,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
             @Override
             public void onClick(View v) {
                 onTabClicked(0);
+                viewPager.setCurrentItem(0);
 
             }
         });
@@ -326,6 +332,8 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
             public void onSearchStateChanged(boolean enabled) {
                 if (!enabled){
                     ((ImageView)searchBar.findViewById(R.id.mt_nav)).setImageResource(R.drawable.ic_search);
+                }
+                else{
                 }
             }
 
@@ -367,6 +375,7 @@ public class MapFragment extends MvpFragment<MapView, MapPresenter> implements M
                         Speech.getInstance().startListening(new SpeechDelegate() {
                             @Override
                             public void onStartOfSpeech() {
+                                Toast.makeText(getActivity(), "Говорите...", Toast.LENGTH_LONG).show();
                                 Log.i("speech", "speech recognition is now active");
                             }
 

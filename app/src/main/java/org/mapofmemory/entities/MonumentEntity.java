@@ -110,6 +110,7 @@ public class MonumentEntity {
         this.name = c.getString(c.getColumnIndex(MonumentEntityTable.NAME_COLUMN));
         this.desc = c.getString(c.getColumnIndex(MonumentEntityTable.DESC_COLUMN));
         this.type = c.getString(c.getColumnIndex(MonumentEntityTable.TYPE_COLUMN));
+        this.type2 = c.getString(c.getColumnIndex(MonumentEntityTable.TYPE_2_COLUMN));
         this.lat = c.getString(c.getColumnIndex(MonumentEntityTable.LAT_COLUMN));
         this.lng = c.getString(c.getColumnIndex(MonumentEntityTable.LNG_COLUMN));
         this.imgs_json = c.getString(c.getColumnIndex(MonumentEntityTable.IMGSJSON_COLUMN));;

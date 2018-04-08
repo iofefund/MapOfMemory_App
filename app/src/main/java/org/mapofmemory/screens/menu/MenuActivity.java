@@ -79,7 +79,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
         isDataUpdated = true;
         PlaceEntityAdapter adapter = new PlaceEntityAdapter(places);
         adapter.setOnPlaceClickListener(place -> openPlace(place.getId()));
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
     }
 
@@ -93,7 +93,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
 
     @Override
     public void onDataSuccess(String date) {
-        status.setText("Данные обновлены\n" + date);
+        status.setText("Данные обновлены: " + date);
         //
         if (isGranted) {
             Observable.just(1)
@@ -114,7 +114,7 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
 
     @Override
     public void onDataFailed(String date) {
-        status.setText("Данные обновлены\n" + date);
+        status.setText("Данные обновлены: " + date);
     }
 
     @Override

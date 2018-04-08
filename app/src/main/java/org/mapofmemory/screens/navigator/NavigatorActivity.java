@@ -8,6 +8,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -49,6 +52,7 @@ import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -69,7 +73,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPresenter> implements NavigatorView, OnLocationUpdatedListener, Marker.OnMarkerClickListener{
+public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPresenter> implements SensorEventListener, NavigatorView, OnLocationUpdatedListener, Marker.OnMarkerClickListener{
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.map_view) MapView mapView;
     @BindDrawable(R.drawable.ic_blue_marker) Drawable blueMarker;
@@ -85,9 +89,39 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
     }
 
     @Override
+    public void onBackPressed() {
+        SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager.unregisterListener(this);
+        SmartLocation.with(NavigatorActivity.this).location().stop();
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) onBackPressed();
         return super.onOptionsItemSelected(item);
+    }
+
+    private long millis = 0;
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
+            float[] gravity = event.values.clone();
+            if (System.currentTimeMillis() - millis >= 50){
+                millis = System.currentTimeMillis();
+                if (userMarker != null){
+                    userMarker.setRotation(gravity[0]);
+                }
+                mapView.invalidate();
+                Log.d("Heading", gravity[0] + "");
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     @Override
@@ -107,27 +141,12 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         }
         SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+        Sensor accSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 
-        SensorListener mySensorEventListener = new SensorListener() {
-            @Override
-            public void onSensorChanged(int sensor, float[] values) {
-                float mHeading = values[0];
-               // mapView.setMapOrientation(-mHeading);
-                if (userMarker != null){
-                    userMarker.setRotation(mHeading);
-                }
-                Log.d("Heading", mHeading + "");
-            }
 
-            @Override
-            public void onAccuracyChanged(int sensor, int accuracy) {
-
-            }
-        };
-        mSensorManager.registerListener(mySensorEventListener,
-                SensorManager.SENSOR_ORIENTATION,
-                SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
+
 
     @Override
     public void onLoadMonument(MonumentEntity monumentEntity, String imgRoot) {
@@ -135,11 +154,12 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         mapView.setMaxZoomLevel(19);
         mapView.setMultiTouchControls(true);
         final GeoPoint startPoint = new GeoPoint(Float.parseFloat(monumentEntity.getLat()), Float.parseFloat(monumentEntity.getLng()));
-        Marker startMarker = new Marker(mapView);
-        startMarker.setPosition(startPoint);
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
-        startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
+        monumentMarker = new Marker(mapView);
+        monumentMarker.setPosition(startPoint);
+        monumentMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
+        monumentMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
         MonumentInfoWindow monumentInfoWindow = new MonumentInfoWindow(mapView, getPresenter().getMonument().getImgs().size() != 0 ? imgRoot + getPresenter().getMonument().getImgs().get(0).getImg() : "", getPresenter().getMonument());
+        monumentInfoWindow.hideBtn();
         monumentInfoWindow.setOnWindowClickListener(new MonumentInfoWindow.OnWindowClickListener() {
             @Override
             public void onWindowClick(MonumentInfoWindow window) {
@@ -151,8 +171,8 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
 
             }
         });
-        startMarker.setInfoWindow(monumentInfoWindow);
-        mapView.getOverlays().add(startMarker);
+        monumentMarker.setInfoWindow(monumentInfoWindow);
+        mapView.getOverlays().add(monumentMarker);
         mapView.getController().setZoom(19);
         mapView.getController().setCenter(startPoint);
         mapView.invalidate();
@@ -162,7 +182,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
                 .withListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted(PermissionGrantedResponse response) {
-                        SmartLocation.with(getApplicationContext()).location().config((new LocationParams.Builder()).setAccuracy(LocationAccuracy.HIGH).setDistance(0.0F).setInterval(2000L).build())
+                        SmartLocation.with(getApplicationContext()).location().config((new LocationParams.Builder()).setAccuracy(LocationAccuracy.HIGH).setDistance(0.0F).setInterval(1000L).build())
                                 .start(NavigatorActivity.this);
                     }
 
@@ -201,53 +221,78 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         return true;
     }
     private Marker userMarker = null;
-
+    private Marker monumentMarker = null;
+    private int i = 0;
+    private Polyline line = null;
     private void updateMap(double userLat, double userLng){
+        i++;
         userMarker = null;
-        mapView.getOverlayManager().clear();
-        mapView.getOverlays().clear();
-        Location loc1 = new Location("");
         final GeoPoint endPoint = new GeoPoint(Float.parseFloat(getPresenter().getMonument().getLat()), Float.parseFloat(getPresenter().getMonument().getLng()));
-        Marker monumentMarker = new Marker(mapView);
-        monumentMarker.setPosition(endPoint);
-        monumentMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
-        monumentMarker.setIcon(getPresenter().getMonument().getType().equals("1") ? redMarker : blueMarker);
-        monumentMarker.setOnMarkerClickListener(this);
-        MonumentInfoWindow monumentInfoWindow = new MonumentInfoWindow(mapView, getPresenter().getMonument().getImgs().size() != 0 ? getPresenter().getPlace().getImgRoot() + getPresenter().getMonument().getImgs().get(0).getImg() : "", getPresenter().getMonument());
-        monumentInfoWindow.setOnWindowClickListener(new MonumentInfoWindow.OnWindowClickListener() {
-            @Override
-            public void onWindowClick(MonumentInfoWindow window) {
-                onMarkerClick(monumentMarker, mapView);
-            }
+        Location loc1 = new Location("");
+        /*if (i == 1) {
+            monumentMarker = new Marker(mapView);
+            monumentMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
+            monumentMarker.setIcon(getPresenter().getMonument().getType().equals("1") ? redMarker : blueMarker);
+            monumentMarker.setOnMarkerClickListener(this);
+            MonumentInfoWindow monumentInfoWindow = new MonumentInfoWindow(mapView, getPresenter().getMonument().getImgs().size() != 0 ? getPresenter().getPlace().getImgRoot() + getPresenter().getMonument().getImgs().get(0).getImg() : "", getPresenter().getMonument());
+            monumentInfoWindow.setOnWindowClickListener(new MonumentInfoWindow.OnWindowClickListener() {
+                @Override
+                public void onWindowClick(MonumentInfoWindow window) {
+                    onMarkerClick(monumentMarker, mapView);
+                }
 
-            @Override
-            public void onButtonClick(MonumentInfoWindow window) {
+                @Override
+                public void onButtonClick(MonumentInfoWindow window) {
 
-            }
-        });
-        monumentMarker.setInfoWindow(monumentInfoWindow);
-        monumentMarker.showInfoWindow();
-        monumentInfoWindow.hideBtn();
-        userMarker = new Marker(mapView);
+                }
+            });
+            monumentMarker.setInfoWindow(monumentInfoWindow);
+            //monumentMarker.showInfoWindow();
+            //monumentInfoWindow.hideBtn();
+            mapView.getOverlays().add(monumentMarker);
+        }
+        monumentMarker.setPosition(endPoint);*/
+
+        boolean b = false;
+        if (userMarker == null){
+            b = true;
+            userMarker = new Marker(mapView);
+        }
         userMarker.setPosition(new GeoPoint(userLat, userLng));
-        float angle = /*- (180*/ 90 - angleFromCoordinate(userLat, userLng, endPoint.getLatitude(), endPoint.getLongitude());
-        userMarker.setRotation(angle);
         userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
         userMarker.setInfoWindow(null);
-        userMarker.setIcon(getDrawable(R.drawable.marker));
-
-        mapView.getOverlays().add(monumentMarker);
+        userMarker.setIcon(getDrawable(R.drawable.navigation_red));
+        mapView.getController().setCenter(userMarker.getPosition());
         loc1.setLatitude(userLat);
         loc1.setLongitude(userLng);
-
         Location loc2 = new Location("");
         loc2.setLatitude(Double.parseDouble(getPresenter().getMonument().getLat()));
         loc2.setLongitude(Double.parseDouble(getPresenter().getMonument().getLng()));
         userMarker.setRotation(loc1.bearingTo(loc2));
-        mapView.getOverlays().add(userMarker);
         int distanceTo = (int)loc1.distanceTo(loc2);
         distance.setText(distanceTo + " м");
         distanceBlock.setVisibility(View.VISIBLE);
+        if (!mapView.getOverlays().contains(userMarker)) mapView.getOverlays().add(userMarker);
+        if (!mapView.getOverlays().contains(monumentMarker)) mapView.getOverlays().add(monumentMarker);
+
+        if (i == 1){
+            double maxLat = Math.max(userMarker.getPosition().getLatitude(), monumentMarker.getPosition().getLatitude());
+            double maxLng = Math.max(userMarker.getPosition().getLongitude(), monumentMarker.getPosition().getLongitude());
+            double minLat = Math.min(userMarker.getPosition().getLatitude(), monumentMarker.getPosition().getLatitude());
+            double minLng = Math.min(userMarker.getPosition().getLongitude(), monumentMarker.getPosition().getLongitude());
+            mapView.zoomToBoundingBox(new BoundingBox(maxLat, maxLng, minLat, minLng), true);
+        }
+        if (line == null){
+            line = new Polyline(getApplicationContext());
+            line.setWidth(8f);
+            line.setColor(Color.BLUE);
+        }
+        List<GeoPoint> pts = new ArrayList<>();
+        pts.add(new GeoPoint(userLat, userLng));
+        pts.add(new GeoPoint(Double.parseDouble(getPresenter().getMonument().getLat()), Double.parseDouble(getPresenter().getMonument().getLng())));
+        line.setPoints(pts);
+        if (!mapView.getOverlays().contains(line)) mapView.getOverlays().add(line);
+        //mapView.invalidate();
         /*int distanceTo = (int)loc1.distanceTo(loc2);
         if (distanceTo >= 2000){
             Observable.just(1)
@@ -283,22 +328,6 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
             distanceBlock.setVisibility(View.VISIBLE);
         }*/
     }
-    private float angleFromCoordinate(double lat1, double long1, double lat2,
-                                       double long2) {
 
-        double dLon = (long2 - long1);
-
-        double y = Math.sin(dLon) * Math.cos(lat2);
-        double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
-                * Math.cos(lat2) * Math.cos(dLon);
-
-        double brng = Math.atan2(y, x);
-
-        brng = Math.toDegrees(brng);
-        brng = (brng + 360) % 360;
-        brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
-
-        return (float)brng;
-    }
 
 }

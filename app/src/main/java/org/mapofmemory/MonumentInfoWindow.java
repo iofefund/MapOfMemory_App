@@ -30,7 +30,7 @@ public class MonumentInfoWindow extends InfoWindow {
     @BindView(R.id.title) TextView title;
     @BindView(R.id.type) TextView type;
     @BindView(R.id.btn_route) FancyButton fancyButton;
-
+    private boolean fancyButtonGone = false;
     private String imageUrl = "";
     private MonumentEntity monument;
     public MonumentInfoWindow(MapView mapView, String imageUrl, MonumentEntity monument) {
@@ -40,7 +40,13 @@ public class MonumentInfoWindow extends InfoWindow {
     }
 
     public void hideBtn(){
-        fancyButton.setVisibility(View.GONE);
+        try {
+            fancyButton.setVisibility(View.GONE);
+        }
+        catch (Exception e){
+            fancyButtonGone = true;
+
+        }
     }
 
     public ImageView getImage() {
@@ -55,6 +61,7 @@ public class MonumentInfoWindow extends InfoWindow {
     public void onOpen(Object item) {
         ButterKnife.bind(this, getView());
         Log.d("IMAGE URL", imageUrl);
+        if (fancyButtonGone) fancyButton.setVisibility(View.GONE);
         if (!imageUrl.isEmpty()) Picasso.with(image.getContext()).load(imageUrl).error(R.drawable.no_photo).into(image);
         title.setText(monument.getName());
         type.setText(monument.getType2());

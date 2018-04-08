@@ -98,6 +98,6 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_activity_navigator">NavigatorActivity</string>
-    <string name="official_site">Официальный сайт "Карта Памяти"</string>
+    <string name="official_site">Сайт \"Карта Памяти\"</string>
     <string name="to_site"><u>Посмотреть страницу памятника на сайте</u></string>
 </resources>

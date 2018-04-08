@@ -7,37 +7,26 @@
     android:orientation="vertical"
     tools:context="org.mapofmemory.screens.menu.MenuActivity">
     <LinearLayout
-        android:background="#424f0b"
+        android:background="#294200"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:orientation="horizontal"
         android:gravity="left|center_vertical"
-        android:paddingLeft="15dp"
         >
-        <RelativeLayout
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/circle3"
-            android:layout_width="70dp"
-            android:layout_height="70dp">
-            <TextView
-                android:gravity="center"
-                android:textColor="#bbc884"
-                android:text="Карта памяти"
-                android:textStyle="bold"
-                android:textSize="14dp"
-                android:layout_centerInParent="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </RelativeLayout>
+        <ImageView
+            android:background="@drawable/logo"
+            android:layout_width="156dp"
+            android:layout_height="80dp" />
 
         <TextView
-            android:layout_marginLeft="15dp"
+            android:layout_marginLeft="-40dp"
+            android:paddingBottom="10dp"
+            android:layout_toRightOf="@+id/circle_block"
+            android:layout_centerVertical="true"
+            android:gravity="center"
             android:id="@+id/header"
-            android:textSize="22dp"
-            android:gravity="center_horizontal"
+            android:textSize="18dp"
             android:textStyle="bold"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
             android:textColor="@android:color/white"
             android:text="Некрополь террора и гулага"
             android:layout_width="wrap_content"
@@ -48,7 +37,7 @@
         android:layout_height="match_parent">
         <ImageView
             android:scaleType="centerCrop"
-            android:background="@drawable/background"
+            android:background="@drawable/background2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
         <android.support.v7.widget.RecyclerView
