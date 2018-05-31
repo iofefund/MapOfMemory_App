@@ -6,96 +6,77 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="org.mapofmemory.screens.menu.MenuActivity">
+
     <LinearLayout
-        android:background="#294200"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:orientation="horizontal"
+        android:background="#294200"
         android:gravity="left|center_vertical"
-        >
+        android:orientation="horizontal">
+
         <ImageView
-            android:background="@drawable/logo"
             android:layout_width="156dp"
-            android:layout_height="80dp" />
+            android:layout_height="80dp"
+            android:background="@drawable/logo" />
 
         <TextView
-            android:layout_marginLeft="-40dp"
-            android:paddingBottom="10dp"
-            android:layout_toRightOf="@+id/circle_block"
-            android:layout_centerVertical="true"
-            android:gravity="center"
             android:id="@+id/header"
-            android:textSize="18dp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:text="Некрополь террора и гулага"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="-40dp"
+            android:gravity="center"
+            android:paddingBottom="10dp"
+            android:fontFamily="@font/pfd_in_display_pro_reg"
+            android:text="Некрополь террора и Гулага"
+            android:textColor="@android:color/white"
+            android:textAllCaps="true"
+            android:textSize="16dp"
+            android:textStyle="bold" />
     </LinearLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <ImageView
-            android:scaleType="centerCrop"
-            android:background="@drawable/background2"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@drawable/background2"
+            android:scaleType="centerCrop" />
+
         <android.support.v7.widget.RecyclerView
-            android:layout_above="@+id/block"
-            android:padding="8dp"
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent"
+            android:paddingBottom="50dp"
+            android:clipToPadding="false"/>
+
         <LinearLayout
             android:id="@+id/block"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:orientation="vertical"
+            android:background="@color/transparentBlack"
             android:gravity="center"
-            android:padding="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:orientation="horizontal"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp">
+
             <TextView
                 android:id="@+id/status"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:layout_height="wrap_content"
-                android:text="Данные обновлены: 28.01.2018 20:05"
+                android:text="Данные обновлены: 6 дней назад"
                 android:textColor="@android:color/white" />
-            <mehdi.sakout.fancybuttons.FancyButton
+
+            <ImageView
                 android:id="@+id/btn_update"
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="10dp"
-                fancy:fb_borderColor="@color/colorPrimary"
-                android:layout_marginBottom="10dp"
-                fancy:fb_borderWidth="1dp"
-                fancy:fb_defaultColor="@android:color/transparent"
-                fancy:fb_focusColor="#9bd823"
-                fancy:fb_radius="4dp"
-                fancy:fb_text="Обновить данные"
-                fancy:fb_textColor="#FFFFFF" />
-            <mehdi.sakout.fancybuttons.FancyButton
-                android:id="@+id/btn_site"
-                android:layout_marginTop="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="10dp"
-                fancy:fb_borderColor="@color/colorPrimary"
-                android:layout_marginBottom="10dp"
-                fancy:fb_borderWidth="1dp"
-                fancy:fb_defaultColor="@android:color/transparent"
-                fancy:fb_focusColor="#9bd823"
-                fancy:fb_radius="4dp"
-                fancy:fb_text="@string/official_site"
-                fancy:fb_textColor="#FFFFFF" />
+                android:src="@drawable/refresh" />
         </LinearLayout>
     </RelativeLayout>
 

@@ -13,10 +13,12 @@ import android.widget.Toast;
 
 import com.hannesdorfmann.mosby3.mvp.MvpActivity;
 import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import org.mapofmemory.FileManager;
@@ -37,13 +39,10 @@ import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implements MenuView, PermissionListener {
+public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implements MenuView, MultiplePermissionsListener {
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.status) TextView status;
-    @OnClick(R.id.btn_site) void onSite(){
-        Intent newInt = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mapofmemory.org/"));
-        startActivity(newInt);
-    }
+
     @OnClick(R.id.btn_update) void onUpdate(){
         status.setText("Идет обновление данных...");
         getPresenter().loadPlaces();
@@ -66,8 +65,10 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         getSupportActionBar().hide();
+
+
         Dexter.withActivity(this)
-                .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION})
                 .withListener(this).check();
         ButterKnife.bind(this);
         getPresenter().loadMonumentsFromCache();
@@ -117,29 +118,28 @@ public class MenuActivity extends MvpActivity<MenuView, MenuPresenter> implement
         status.setText("Данные обновлены: " + date);
     }
 
+
+
     @Override
-    public void onPermissionGranted(PermissionGrantedResponse response) {
-        isGranted = true;
-        Observable.just(1)
-                .subscribeOn(Schedulers.io())
-                .filter(res -> {
-                    FileManager fileManager = new FileManager(getAssets());
-                    fileManager.copyFileIfNeeded("cache.db");
-                    return true;
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(res -> {
-                    isDataUpdated = true;
-                });
+    public void onPermissionsChecked(MultiplePermissionsReport report) {
+        isGranted = report.areAllPermissionsGranted();
+        if(isGranted) {
+            Observable.just(1)
+                    .subscribeOn(Schedulers.io())
+                    .filter(res -> {
+                        FileManager fileManager = new FileManager(getAssets());
+                        fileManager.copyFileIfNeeded("cache.db");
+                        return true;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(res -> {
+                        isDataUpdated = true;
+                    });
+        }
     }
 
     @Override
-    public void onPermissionDenied(PermissionDeniedResponse response) {
-
-    }
-
-    @Override
-    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
 
     }
 }

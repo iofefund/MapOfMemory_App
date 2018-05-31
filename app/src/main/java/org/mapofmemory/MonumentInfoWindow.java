@@ -19,6 +19,7 @@ import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 /**
@@ -69,9 +70,15 @@ public class MonumentInfoWindow extends InfoWindow {
         fancyButton.setOnClickListener(v -> onWindowClickListener.onButtonClick(this));
     }
 
+    @OnClick(R.id.close)
+    protected void onClickClose(){
+        onWindowClickListener.onCloseClick();
+    }
+
     public interface OnWindowClickListener{
         void onWindowClick(MonumentInfoWindow window);
         void onButtonClick(MonumentInfoWindow window);
+        void onCloseClick();
     }
     private OnWindowClickListener onWindowClickListener;
 

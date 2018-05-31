@@ -35,26 +35,41 @@ import mehdi.sakout.fancybuttons.FancyButton;
  * Created by The Tronuo on 04.02.2018.
  */
 
-public class DOMFragment extends MvpFragment<DOMView, DOMPresenter> implements DOMView{
-    @BindView(R.id.shortText) TextView shortText;
-    @BindView(R.id.detailedText) TextView detailedText;
-    @BindView(R.id.image) ImageView image;
-    @BindView(R.id.future_dom_image) ImageView futureDomImage;
-    @BindView(R.id.future_dom_date) TextView futureDomDate;
-    @BindView(R.id.future_dom_title) TextView futureDomTitle;
-    @BindView(R.id.viewpager) ViewPager viewPager;
-    @BindView(R.id.dom_block) LinearLayout domBlock;
-    @OnClick(R.id.btn_write) void onWrite(){
-        try{
-            Intent intent= new Intent(Intent.ACTION_VIEW, Uri.parse(getPresenter().getPlaceEntity().getUrl()));
+public class DOMFragment extends MvpFragment<DOMView, DOMPresenter> implements DOMView {
+    @BindView(R.id.shortText)
+    TextView shortText;
+    @BindView(R.id.detailedText)
+    TextView detailedText;
+    @BindView(R.id.image)
+    ImageView image;
+    @BindView(R.id.future_dom_image)
+    ImageView futureDomImage;
+    @BindView(R.id.future_dom_date)
+    TextView futureDomDate;
+    @BindView(R.id.future_dom_title)
+    TextView futureDomTitle;
+    @BindView(R.id.viewpager)
+    ViewPager viewPager;
+    @BindView(R.id.dom_block)
+    LinearLayout domBlock;
+    @BindView(R.id.btn_write)
+    View btnWrite;
+
+
+    @OnClick(R.id.btn_write)
+    void onWrite() {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, getPresenter().getPlaceEntity().getTitle().toLowerCase().contains("сандор") ? Uri.parse("https://sand.mapofmemory.org/events/") : Uri.parse(getPresenter().getPlaceEntity().getUrl()));
             startActivity(intent);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
-    @BindView(R.id.progress) ProgressBar progressBar;
-    @BindView(R.id.nested) NestedScrollView nestedScrollView;
+
+    @BindView(R.id.progress)
+    ProgressBar progressBar;
+    @BindView(R.id.nested)
+    NestedScrollView nestedScrollView;
 
     @Override
     public DOMPresenter createPresenter() {
@@ -78,33 +93,31 @@ public class DOMFragment extends MvpFragment<DOMView, DOMPresenter> implements D
     public void onDOMLoad(List<DayOfMemory> doms) {
         List<DayOfMemory> dayOfMemories = doms;
         int isFuture = -1;
-        for (int i = 0; i <= dayOfMemories.size() - 1; i++){
-            if (dayOfMemories.get(i).getType().equals("2")){
+        for (int i = 0; i <= dayOfMemories.size() - 1; i++) {
+            if (dayOfMemories.get(i).getType().equals("2")) {
                 isFuture = i;
                 break;
             }
         }
-        if (isFuture != -1){
+        if (isFuture != -1) {
             DayOfMemory futureDOM = Observable.fromIterable(dayOfMemories)
                     .filter(dayOfMemory -> dayOfMemory.getType().equals("2"))
                     .blockingFirst();
             Picasso.with(getActivity()).load(futureDOM.getImage()).into(futureDomImage);
-            futureDomDate.setText(AppConfig.convertDate(futureDOM.getDate()));
+
             futureDomTitle.setText(futureDOM.getTitle());
             dayOfMemories = Observable.fromIterable(dayOfMemories)
                     .filter(dayOfMemory -> dayOfMemory.getType().equals("1"))
                     .toList()
                     .blockingGet();
-        }
-        else{
+        } else {
             domBlock.setVisibility(View.GONE);
         }
         if (dayOfMemories.size() > 0) {
             DOMAdapter domAdapter = new DOMAdapter(getActivity().getSupportFragmentManager(), dayOfMemories);
             viewPager.setAdapter(domAdapter);
             viewPager.setPageMargin(20);
-        }
-        else{
+        } else {
             viewPager.setVisibility(View.GONE);
         }
         progressBar.setVisibility(View.GONE);

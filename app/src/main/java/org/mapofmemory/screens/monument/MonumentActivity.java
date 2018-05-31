@@ -52,7 +52,7 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
     @BindView(R.id.gps) TextView gps;
 
     @BindDrawable(R.drawable.ic_blue_marker) Drawable blueMarker;
-    @BindDrawable(R.drawable.ic_red_marker) Drawable redMarker;
+    @BindDrawable(R.drawable.ic_green_marker) Drawable greenMarker;
 
     @OnClick(R.id.site) void onSite(){
         Intent newInt = new Intent(Intent.ACTION_VIEW, Uri.parse(getPresenter().getPlace().getUrl() + "/monument/?m_id=" + getPresenter().getMonumentEntity().getId()));
@@ -65,12 +65,13 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
         startActivity(newInt);
     }
 
-    @OnClick(R.id.gps_block) void onCopyGPS(){
+    @OnClick(R.id.copy) void onCopyGPS(){
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("GPS", gps.getText().toString());
         clipboard.setPrimaryClip(clip);
         Toast.makeText(this, "Скопировано", Toast.LENGTH_SHORT).show();
     }
+
 
     @NonNull
     @Override
@@ -104,8 +105,8 @@ public class MonumentActivity extends MvpActivity<MonumentView, MonumentPresente
             final GeoPoint startPoint = new GeoPoint(Float.parseFloat(monumentEntity.getLat()), Float.parseFloat(monumentEntity.getLng()));
             Marker startMarker = new Marker(mapView);
             startMarker.setPosition(startPoint);
-            startMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
-            startMarker.setIcon(monumentEntity.getType().equals("1") ? redMarker : blueMarker);
+            startMarker.setAnchor(Marker.ANCHOR_CENTER, 0.66f);
+            startMarker.setIcon(greenMarker);
             mapView.getOverlays().add(startMarker);
             mapView.getController().setZoom(15);
             mapView.getController().setCenter(startPoint);

@@ -2,6 +2,7 @@ package org.mapofmemory.screens.navigator;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -21,6 +22,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +31,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +50,7 @@ import org.mapofmemory.MonumentInfoWindow;
 import org.mapofmemory.R;
 import org.mapofmemory.entities.MonumentEntity;
 import org.mapofmemory.screens.main.MainActivity;
+import org.mapofmemory.screens.monument.MonumentActivity;
 import org.mapofmemory.screens.monument.MonumentView;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
@@ -163,14 +167,30 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         monumentInfoWindow.setOnWindowClickListener(new MonumentInfoWindow.OnWindowClickListener() {
             @Override
             public void onWindowClick(MonumentInfoWindow window) {
-
+                ImageView image = window.getImage();
+                ActivityOptionsCompat options =
+                        ActivityOptionsCompat.makeClipRevealAnimation(image, (int) image.getX(), (int) image.getY(), image.getWidth(), image.getHeight());
+                Intent newInt = new Intent(NavigatorActivity.this, MonumentActivity.class);
+                newInt.putExtra("monument_id", monumentEntity.getNum() + "");
+                newInt.putExtra("image_url", window.getImageUrl());
+                newInt.putExtra("name", monumentEntity.getName());
+                newInt.putExtra("type2", monumentEntity.getType2());
+                newInt.putExtra("descr", monumentEntity.getDesc());
+                startActivity(newInt, options.toBundle());
             }
 
             @Override
             public void onButtonClick(MonumentInfoWindow window) {
 
             }
+
+            @Override
+            public void onCloseClick() {
+                monumentInfoWindow.close();
+            }
         });
+
+
         monumentMarker.setInfoWindow(monumentInfoWindow);
         mapView.getOverlays().add(monumentMarker);
         mapView.getController().setZoom(19);
@@ -261,7 +281,7 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         userMarker.setPosition(new GeoPoint(userLat, userLng));
         userMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
         userMarker.setInfoWindow(null);
-        userMarker.setIcon(getDrawable(R.drawable.navigation_red));
+        userMarker.setIcon(getDrawable(R.drawable.point));
         mapView.getController().setCenter(userMarker.getPosition());
         loc1.setLatitude(userLat);
         loc1.setLongitude(userLng);
@@ -270,10 +290,9 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         loc2.setLongitude(Double.parseDouble(getPresenter().getMonument().getLng()));
         userMarker.setRotation(loc1.bearingTo(loc2));
         int distanceTo = (int)loc1.distanceTo(loc2);
-        distance.setText(distanceTo + " м");
+        distance.setText(distanceTo + " М");
         distanceBlock.setVisibility(View.VISIBLE);
-        if (!mapView.getOverlays().contains(userMarker)) mapView.getOverlays().add(userMarker);
-        if (!mapView.getOverlays().contains(monumentMarker)) mapView.getOverlays().add(monumentMarker);
+
 
         if (i == 1){
             double maxLat = Math.max(userMarker.getPosition().getLatitude(), monumentMarker.getPosition().getLatitude());
@@ -292,6 +311,9 @@ public class NavigatorActivity extends MvpActivity<NavigatorView, NavigatorPrese
         pts.add(new GeoPoint(Double.parseDouble(getPresenter().getMonument().getLat()), Double.parseDouble(getPresenter().getMonument().getLng())));
         line.setPoints(pts);
         if (!mapView.getOverlays().contains(line)) mapView.getOverlays().add(line);
+        if (!mapView.getOverlays().contains(userMarker)) mapView.getOverlays().add(userMarker);
+        if (!mapView.getOverlays().contains(monumentMarker)) mapView.getOverlays().add(monumentMarker);
+
         //mapView.invalidate();
         /*int distanceTo = (int)loc1.distanceTo(loc2);
         if (distanceTo >= 2000){

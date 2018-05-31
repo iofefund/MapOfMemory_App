@@ -1,6 +1,7 @@
 package org.mapofmemory;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.pushtorefresh.storio3.sqlite.SQLiteTypeMapping;
 import com.pushtorefresh.storio3.sqlite.StorIOSQLite;
@@ -16,8 +17,14 @@ import org.mapofmemory.entities.MonumentEntityStorIOSQLitePutResolver;
  */
 
 public class BaseApplication extends Application {
+
+    public  static Context appContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        appContext = getApplicationContext();
     }
+
+
 }

@@ -9,38 +9,45 @@
     tools:context="org.mapofmemory.screens.monument.MonumentActivity"
     tools:showIn="@layout/activity_monument">
     <LinearLayout
-        android:padding="8dp"
+        android:padding="20dp"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/type"
-            android:textSize="20dp"
+            android:textSize="13sp"
+            android:textAllCaps="true"
+            android:fontFamily="@font/roboto_regular"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="#434343"/>
         <TextView
             android:id="@+id/name"
-            android:textStyle="bold"
-            android:textSize="18dp"
+            android:fontFamily="@font/roboto_black"
+            android:textSize="18sp"
             android:maxLines="2"
             android:ellipsize="end"
+            android:textAllCaps="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="#434343"/>
         <TextView
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="12dp"
             android:id="@+id/text"
+            android:fontFamily="@font/roboto_regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="fsafas" />
+            android:textSize="13sp"
+            android:textColor="#3E3E3E"/>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         <org.osmdroid.views.MapView
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:id="@+id/map_view"
             android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="300dp"></org.osmdroid.views.MapView>
+            android:layout_height="220dp"/>
             <RelativeLayout
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
@@ -56,12 +63,10 @@
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:paddingTop="10dp"
-                fancy:fb_borderColor="#FFFFFF"
-                fancy:fb_borderWidth="1dp"
-                fancy:fb_defaultColor="@android:color/holo_red_light"
-                fancy:fb_focusColor="@android:color/holo_red_dark"
+                fancy:fb_defaultColor="#293556"
+                fancy:fb_focusColor="#293556"
                 fancy:fb_radius="30dp"
-                fancy:fb_text="Проложить маршрут"
+                fancy:fb_text="ПРОЛОЖИТЬ МАРШРУТ"
                 fancy:fb_textColor="#FFFFFF" />
             </RelativeLayout>
         </RelativeLayout>
@@ -74,32 +79,52 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Координаты GPS" />
-        <TextView
-            android:layout_marginTop="3dp"
-            android:id="@+id/gps"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="32.4214' 51.123'" />
+            android:textSize="13sp"
+            android:fontFamily="@font/roboto_regular"
+            android:text="КООРДИНАТЫ GPS"
+            android:textColor="#434343"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_marginTop="3dp"
+                    android:id="@+id/gps"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/roboto_black"
+                    android:textSize="18sp"
+                    android:textColor="#434343"
+                    android:layout_height="wrap_content"
+                    android:text="32.4214' 51.123'" />
+
+                <TextView
+                    android:id="@+id/copy"
+                    android:layout_width="wrap_content"
+                    android:text="скопировать"
+                    android:fontFamily="@font/roboto_regular"
+                    android:layout_height="wrap_content"
+                    android:textColor="#747474"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+
     </LinearLayout>
         <LinearLayout
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="30dp"
             android:id="@+id/site_block"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:text="Переход на сайт" />
+
             <TextView
                 android:layout_marginTop="3dp"
                 android:id="@+id/site"
-                android:textColor="@android:color/holo_red_dark"
+                android:textColor="#E80D0D"
+                android:fontFamily="@font/roboto_regular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="13sp"
                 android:text="@string/to_site" />
         </LinearLayout>
     </LinearLayout>

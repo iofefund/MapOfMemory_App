@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Map of Memory</string>
+    <string name="app_name">Некрополь террора и Гулага</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -100,4 +100,5 @@
     <string name="title_activity_navigator">NavigatorActivity</string>
     <string name="official_site">Сайт \"Карта Памяти\"</string>
     <string name="to_site"><u>Посмотреть страницу памятника на сайте</u></string>
+    <string name="to_event">Информацию о ближайших днях памяти Вы можете найти на сайте</string>
 </resources>

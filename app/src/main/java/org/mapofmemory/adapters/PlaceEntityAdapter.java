@@ -1,7 +1,9 @@
 package org.mapofmemory.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
@@ -70,7 +73,12 @@ public class PlaceEntityAdapter extends RecyclerView.Adapter<PlaceEntityAdapter.
     @Override
     public void onBindViewHolder(PlaceHolder holder, int position) {
         PlaceEntity place = places.get(position);
-        Picasso.with(holder.getContext()).load(place.getImgRoot() + place.getImg()).into(holder.imageView);
+        Log.w("log", "onBindViewHolder: " + place.getImgRoot() + place.getImg() );
+
+     //   Picasso.with(holder.getContext()).load(place.getImgRoot() + place.getImg()).into(holder.imageView);
+
+        Glide.with(holder.getContext()).load(place.getImgRoot() + place.getImg()).into(holder.imageView);
+
         holder.titleView.setText(place.getTitle());
         holder.descrView.setText(place.getDescr());
         holder.block.setOnClickListener(v -> onPlaceClickListener.onClick(place));
